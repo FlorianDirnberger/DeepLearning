@@ -1,0 +1,25 @@
+# Ignore virtual environment
+/scripts/02456_grp_97_venv/
+
+
+# Ignore log files
+*.log
+
+# Ignore temporary files
+*.tmp
+
+# Ignore models directory and submodels 
+/models/
+/models/model_SpectrVelCNNRegr_
+/models/model_SpectrVelCNNRegr_happy-darkness-1
+
+# Ignore wand files 
+/wandb
+
+# ignore the .env file for the personal api key 
+*.env 
+
+# ignore .ssh files
+*.ssh
+.ssh/key
+.ssh/key.pub

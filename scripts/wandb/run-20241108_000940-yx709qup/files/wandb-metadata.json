@@ -1,0 +1,45 @@
+{
+  "os": "Linux-6.1.112-1.el9.elrepo.x86_64-x86_64-with-glibc2.34",
+  "python": "3.9.18",
+  "startedAt": "2024-11-07T23:09:40.748817Z",
+  "program": "/zhome/9e/8/212358/Documents/DeepLearning/scripts/modular_train_test.py",
+  "codePath": "modular_train_test.py",
+  "email": "florian.alois.dirnberger@gmail.com",
+  "root": "/zhome/9e/8/212358/Documents/DeepLearning/scripts",
+  "host": "n-62-20-1",
+  "username": "s242022",
+  "executable": "/zhome/9e/8/212358/Documents/DeepLearning/scripts/02456_grp_97_venv/bin/python",
+  "codePathLocal": "modular_train_test.py",
+  "cpu_count": 24,
+  "cpu_count_logical": 24,
+  "gpu": "Tesla V100-PCIE-16GB",
+  "gpu_count": 2,
+  "disk": {
+    "/": {
+      "total": "76817485824",
+      "used": "5739737088"
+    }
+  },
+  "memory": {
+    "total": "201904611328"
+  },
+  "cpu": {
+    "count": 24,
+    "countLogical": 24
+  },
+  "gpu_nvidia": [
+    {
+      "name": "Tesla V100-PCIE-16GB",
+      "memoryTotal": "17179869184",
+      "cudaCores": 5120,
+      "architecture": "Volta"
+    },
+    {
+      "name": "Tesla V100-PCIE-16GB",
+      "memoryTotal": "17179869184",
+      "cudaCores": 5120,
+      "architecture": "Volta"
+    }
+  ],
+  "cudaVersion": "12.6"
+}

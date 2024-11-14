@@ -12,12 +12,16 @@ class CNN_97(nn.Module):
 
     def __init__(self, 
                  num_conv_layers=4,
-                 num_fc_layers=3,
                  conv_dropout=0.2, 
-                 linear_dropout=0.1, 
+                 num_fc_layers=3, 
                  kernel_size=5,
+                 stride = 1, 
+                 padding = 2,
+                 pooling_size = 2,
+                 linear_dropout=0.1, 
                  activation=nn.ReLU,
                  hidden_units=1024,
+                 out_channels = 16, # Starting output channels for the first conv layer
                  input_shape=(6, 74, 918)):
         super().__init__()
         
@@ -25,27 +29,25 @@ class CNN_97(nn.Module):
         conv_layers = []
         in_channels = input_shape[0]  # Assuming the input has 6 channels
         height, width = input_shape[1], input_shape[2]
-        out_channels = 16  # Starting output channels for the first conv layer
-        stride = 1
 
         for _ in range(num_conv_layers):
             conv_layers.append(nn.Conv2d(in_channels=in_channels,
                                          out_channels=out_channels,
                                          kernel_size=kernel_size,
-                                         stride=1,
-                                         padding=kernel_size // 2))
+                                         stride=stride,
+                                         padding=padding))
             conv_layers.append(nn.BatchNorm2d(out_channels))
             conv_layers.append(activation())
-            conv_layers.append(nn.MaxPool2d(kernel_size=2))
+            conv_layers.append(nn.MaxPool2d(kernel_size=pooling_size))
             conv_layers.append(nn.Dropout(conv_dropout))
             in_channels = out_channels  # Update input channels for the next layer
             out_channels *= 2  # Double output channels for each subsequent layer
             
             # this is just to track the sizes 
             # Update dimensions after convolution and pooling
-            height = (height + 2 * (kernel_size // 2) - kernel_size) // stride + 1  # Convolution output height
-            width = (width + 2 * (kernel_size // 2) - kernel_size) // stride + 1    # Convolution output width
-            height, width = height // 2, width // 2  # After max pooling with kernel_size=2
+            height = (height + 2 * padding - kernel_size) // stride + 1  # Convolution output height
+            width = (width + 2 * padding - kernel_size) // stride + 1    # Convolution output width
+            height, width = height // pooling_size, width // pooling_size  # After max pooling with kernel_size=2
 
         self.conv_layers = nn.Sequential(*conv_layers)
         self.flatten = nn.Flatten()

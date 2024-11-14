@@ -80,7 +80,11 @@ def train():
             linear_dropout=config.linear_dropout,
             kernel_size=config.kernel_size,
             activation=activation_fn,
-            hidden_units=config.hidden_units
+            hidden_units=config.hidden_units,
+            padding = config.padding,
+            stride = config.stride,
+            pooling_size = config.pooling_size,
+            out_channels = config.out_channels 
         ).to(DEVICE)
 
         model.apply(weights_init_uniform_rule)
@@ -164,31 +168,43 @@ sweep_config = {
     
     'parameters': {
         'conv_dropout': {
-            'values': [0.1]
+            'values': [0.1, 0.3, 0.5]
         },
         'linear_dropout': {
-            'values': [0.3]
+            'values': [0.1, 0.3, 0.5]
         },
         'kernel_size': {
-            'values': [3,5]
+            'values': [3, 5, 7]
         },
         'hidden_units': {
-            'values': [512, 1024, 2048]
+            'values': [64, 128, 256]
         },
         'learning_rate': {
-            'values': [1e-5, 1e-6]
+            'values': [1e-4, 1e-5, 1e-6]
         },
         'epochs': {
-            'values': [1]
+            'values': [10, 20, 50]
         },
         'batch_size': {
-            'values': [10,20]
+            'values': [16, 32, 64]
         },
         'num_conv_layers':{
             'values':[1,2,3]
         },
         'num_fc_layers':{
-            'values': [1,2]
+            'values': [1,2,3]
+        },
+        'stride': {
+            'values': [1,2,3]
+        },
+        'padding': {
+            'values': [1,2,3]
+        },
+        'pooling_size':{
+            'values': [1,2,4]
+        },
+        'out_channels':{
+            'values': [16,32] # at least 2^max_num_conv layers
         }
     }
 }

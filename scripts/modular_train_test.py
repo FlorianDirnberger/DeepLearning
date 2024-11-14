@@ -68,7 +68,14 @@ def train_one_epoch(loss_fn, model, train_data_loader, optimizer):
 def train():
     with wandb.init() as run:
         config = run.config
-        activation_fn = nn.ReLU
+        #activation_fn = nn.ReLU
+        activation_fn_map = {
+            'ReLU': nn.ReLU,
+            'LeakyReLU': nn.LeakyReLU,
+            'Tanh': nn.Tanh,
+            'Sigmoid': nn.Sigmoid
+        }
+        
 
         
 
@@ -79,7 +86,7 @@ def train():
             conv_dropout=config.conv_dropout,
             linear_dropout=config.linear_dropout,
             kernel_size=config.kernel_size,
-            activation=activation_fn,
+            activation=activation_fn_map[config.activation_fn],
             hidden_units=config.hidden_units,
             padding = config.padding,
             stride = config.stride,
@@ -205,6 +212,9 @@ sweep_config = {
         },
         'out_channels':{
             'values': [16,32] # at least 2^max_num_conv layers
+        },
+        'activation_fn': {
+            'values': ['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid']
         }
     }
 }

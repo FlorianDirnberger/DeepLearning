@@ -15,6 +15,6 @@ First of all we should do research about suitable parameters and decide on a str
 
 List the parameters here following the template 
 
-parameter: [Interval_min, Interval_max], [Chosen_val1, chosen_val2, ... ] # Argumentation
+parameter: [Interval_min, Interval_max], [Chosen_val1, chosen_val2, ... ] # Argumentation + source
 
 #tbd here# 

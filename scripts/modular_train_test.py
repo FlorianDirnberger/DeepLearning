@@ -103,7 +103,8 @@ def train():
             padding = config.padding,
             stride = config.stride,
             pooling_size = config.pooling_size,
-            out_channels = config.out_channels 
+            out_channels = config.out_channels,
+            use_fc_batchnorm=config.use_fc_batchnorm 
         ).to(DEVICE)
 
         # Weight initializations depending on activation function
@@ -128,7 +129,22 @@ def train():
 
         model.apply(weights_init_map[config.weights_init])
 
-        optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=0.9)
+
+        # Optimizer mapping
+        optimizer_map = {
+            'SGD': torch.optim.SGD,
+            'AdamW': torch.optim.AdamW
+        }
+
+        optimizer_params = {
+            'params': model.parameters(),
+            'lr': config.learning_rate,
+            'weight_decay': config.weight_decay
+        }
+
+        print(f"Optimizer params for {config.optimizer}: {optimizer_params}")
+        optimizer = optimizer_map[config.optimizer](**optimizer_params)
+
         loss_fn = model.loss_fn
 
         # Data Setup
@@ -251,6 +267,19 @@ sweep_config = {
         },
         'weights_init': {
             'values': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal', 'Xavier_uniform', 'Xavier_normal']
+        },
+
+        # Parameter for batchnorm on fc_layers
+        'use_fc_batchnorm': {
+            'values': [True, False]
+        },
+
+        # Parameters for optimizer
+        'optimizer': {
+            'values': ['SGD', 'AdamW']
+        },
+        'weight_decay': {
+            'values': [0, 1e-5, 1e-4, 1e-3, 1e-2]        
         }
     }
 }

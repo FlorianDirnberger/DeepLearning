@@ -22,6 +22,10 @@ class CNN_97(nn.Module):
                  activation=nn.ReLU,
                  hidden_units=1024,
                  out_channels = 16, # Starting output channels for the first conv layer
+                 optimizer = 'SGD',
+                 weight_decay = 0,
+                 momentum = 0.9,
+                 use_fc_batchnorm=True,
                  input_shape=(6, 74, 918)):
         super().__init__()
         
@@ -59,6 +63,8 @@ class CNN_97(nn.Module):
         fc_layers = []
         for i in range(num_fc_layers - 1):
             fc_layers.append(nn.Linear(input_dim, hidden_units))
+            if use_fc_batchnorm:  # Add BatchNorm1d if enabled
+                fc_layers.append(nn.BatchNorm1d(hidden_units))
             fc_layers.append(activation())
             fc_layers.append(nn.Dropout(linear_dropout))
             input_dim = hidden_units  # Update for the next layer

@@ -35,6 +35,12 @@ lr_scheduler: [None, Step, Exponential] # Gives additional hyperparameter to mom
 weight_init [random]
 
 
+batchnorm on fc_layers:     [True, False]
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+INITIAL IDEA:
+----------------------------------------------------------------------------------------------------------------------------------------
 optimizer:  SGD + weight decay + momentum                       # can handel large data sets effectively,
                                                                 # regularization (weight_decay): prevents overfitting (1e-5, 1e-4, 1e-3),
                                                                 # momentum accelerates SGD to find minimum (between 0.5 and 0.99),
@@ -54,8 +60,20 @@ optimizer:  SGD + weight decay + momentum                       # can handel lar
                                                                 # maybe good for our case because we just want to finde one point (initial velocity),
                                                                 # but I'm not sure if that is what meant by sparse data
 
-
-weight_decay:   [1e-5, 1e-1], [1e-5, 1e-4, 1e-3, 1e-2]          # prevents overfitting (can be adapted with SGD and AdamW)
+weight_decay:   [1e-5, 1e-1], [0, 1e-5, 1e-4, 1e-3, 1e-2]       # prevents overfitting (can be adapted with SGD and AdamW)
                                                                 # Didn't choose: 1e-1 (very strong regularization probably not necessary)
 
-momentum:       (0,1),         [0.5, 0.6, 0.7, 0.8]             # smaller values leads to noisy updates, that's why values are choosen like this
+momentum:       (0,1),         [0.6, 0.7, 0.8, 0.9]            # smaller values leads to noisy updates, that's why values are choosen like this
+---------------------------------------------------------------------------------------------------------------------------------------
+PROBLEM: Not figured out yet how to set up wandb_config that there are no redundant runs. 
+         e.g. Adam need no weight_decay but runs for all different weight_decay values without using them.
+---------------------------------------------------------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------------------------------------------------------
+For NOW (easier to implement):
+----------------------------------------------------------------------------------------------------------------------------------------
+optimizer: [SGD, AdamW]                         # choosen parameter (both can incorporat weight_decay and 
+                                                                     Adam is perhaps no longer necessary if use AdamW with weight_decay=0;
+                                                                     only AdaGrad is missing)
+weight_decay: [0, 1e-5, 1e-4, 1e-3, 1e-2]       # choosen parameter
+

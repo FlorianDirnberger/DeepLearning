@@ -36,10 +36,11 @@ weight_init [random]
 
 
 batchnorm on fc_layers:     [True, False]
+batchnorm on cnn_layers:    [True, False]
 
 
 ----------------------------------------------------------------------------------------------------------------------------------------
-INITIAL IDEA:
+INITIAL IDEA FOR OPTIMIZER:
 ----------------------------------------------------------------------------------------------------------------------------------------
 optimizer:  SGD + weight decay + momentum                       # can handel large data sets effectively,
                                                                 # regularization (weight_decay): prevents overfitting (1e-5, 1e-4, 1e-3),
@@ -63,17 +64,12 @@ optimizer:  SGD + weight decay + momentum                       # can handel lar
 weight_decay:   [1e-5, 1e-1], [0, 1e-5, 1e-4, 1e-3, 1e-2]       # prevents overfitting (can be adapted with SGD and AdamW)
                                                                 # Didn't choose: 1e-1 (very strong regularization probably not necessary)
 
-momentum:       (0,1),         [0.6, 0.7, 0.8, 0.9]            # smaller values leads to noisy updates, that's why values are choosen like this
----------------------------------------------------------------------------------------------------------------------------------------
-PROBLEM: Not figured out yet how to set up wandb_config that there are no redundant runs. 
-         e.g. Adam need no weight_decay but runs for all different weight_decay values without using them.
----------------------------------------------------------------------------------------------------------------------------------------
+momentum:       (0,1),         [0.7, 0.8, 0.9]            # smaller values leads to noisy updates, that's why values are choosen like this
 
+---------------------------------------------------------------------------------------------------------------------------------------
+Implemented:
 ----------------------------------------------------------------------------------------------------------------------------------------
-For NOW (easier to implement):
-----------------------------------------------------------------------------------------------------------------------------------------
-optimizer: [SGD, AdamW]                         # choosen parameter (both can incorporat weight_decay and 
-                                                                     Adam is perhaps no longer necessary if use AdamW with weight_decay=0;
-                                                                     only AdaGrad is missing)
-weight_decay: [0, 1e-5, 1e-4, 1e-3, 1e-2]       # choosen parameter
+optimizer: [SGD, Adam, AdamW, AdaGrad]                         # optimizer uses weight_decay/momentum as mentioned above 
+weight_decay: [0, 1e-5, 1e-4, 1e-3, 1e-2]                      # choosen parameter
+momentum: [0.7, 0.8, 0.9]
 

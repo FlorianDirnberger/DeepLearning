@@ -104,7 +104,8 @@ def train():
             stride = config.stride,
             pooling_size = config.pooling_size,
             out_channels = config.out_channels,
-            use_fc_batchnorm=config.use_fc_batchnorm 
+            use_fc_batchnorm = config.use_fc_batchnorm,
+            use_cnn_batchnorm = config.use_cnn_batchnorm 
         ).to(DEVICE)
 
         # Weight initializations depending on activation function
@@ -133,16 +134,57 @@ def train():
         # Optimizer mapping
         optimizer_map = {
             'SGD': torch.optim.SGD,
-            'AdamW': torch.optim.AdamW
+            'Adam': torch.optim.Adam,
+            'AdamW': torch.optim.AdamW,
+            'AdaGrad': torch.optim.Adagrad
         }
 
-        optimizer_params = {
-            'params': model.parameters(),
-            'lr': config.learning_rate,
-            'weight_decay': config.weight_decay
+        # To avoid redundant runs
+        valid_optimizer_weight_decay_combinations = {
+            'SGD': sweep_config['parameters']['weight_decay']['values'],
+            'Adam': [sweep_config['parameters']['weight_decay']['values'][0]],
+            'AdamW': sweep_config['parameters']['weight_decay']['values'],
+            'AdaGrad': [sweep_config['parameters']['weight_decay']['values'][0]]
         }
 
-        print(f"Optimizer params for {config.optimizer}: {optimizer_params}")
+        valid_optimizer_momentum_combinations = {
+            'SGD': sweep_config['parameters']['momentum']['values'],
+            'Adam': [sweep_config['parameters']['momentum']['values'][0]],
+            'AdamW': [sweep_config['parameters']['momentum']['values'][0]],
+            'AdaGrad': [sweep_config['parameters']['momentum']['values'][0]]
+        }
+
+        if config.weight_decay not in valid_optimizer_weight_decay_combinations[config.optimizer]:
+            print(f"Invalid combination: {config.optimizer} + {config.weight_decay}")
+            return # skips the current run
+        
+        if config.momentum not in valid_optimizer_momentum_combinations[config.optimizer]:
+            print(f"Invalid combination: {config.optimizer} + {config.weight_decay} + {config.momentum}")
+            return # skips the current run
+
+        if config.optimizer == 'SGD':
+            optimizer_params = {
+                'params': model.parameters(),
+                'lr': config.learning_rate,
+                'weight_decay': config.weight_decay,
+                'momentum': config.momentum 
+            }
+        
+        elif config.optimizer == 'AdamW':
+            optimizer_params = {
+                'params': model.parameters(),
+                'lr': config.learning_rate,
+                'weight_decay': config.weight_decay  # Only for AdamW
+            }
+
+        else:  # For Adam and AdaGrad
+            optimizer_params = {
+                'params': model.parameters(),
+                'lr': config.learning_rate          # Basic parameters for Adam and AdaGrad
+            }
+
+
+        # print(f"Optimizer params for {config.optimizer}: {optimizer_params}")
         optimizer = optimizer_map[config.optimizer](**optimizer_params)
 
         loss_fn = model.loss_fn
@@ -224,43 +266,43 @@ sweep_config = {
     
     'parameters': {
         'conv_dropout': {
-            'values': [0.1, 0.3, 0.5]
+            'values': [0.1, 0.3, 0.5] #[0.1, 0.3, 0.5]
         },
         'linear_dropout': {
-            'values': [0.1, 0.3, 0.5]
+            'values': [0.1, 0.3, 0.5] #[0.1, 0.3, 0.5]
         },
         'kernel_size': {
             'values': ['3x3', '5x5', '7x7', '1x3', '3x1', '3x5', '5x3', '3x7', '7x3']
         },
         'hidden_units': {
-            'values': [64, 128, 256]
+            'values': [64, 128, 256] #[64, 128, 256]
         },
         'learning_rate': {
             'values': [1e-3, 1e-4, 1e-5, 1e-6]
         },
         'epochs': {
-            'values': [10, 20, 50]
+            'values': [10, 20, 50] #[10, 20, 50]
         },
         'batch_size': {
-            'values': [16, 32, 64]
+            'values': [16, 32, 64] #[16, 32, 64]
         },
         'num_conv_layers':{
             'values': [1,2,3]
         },
         'num_fc_layers':{
-            'values': [1,2,3]
+            'values': [1,2,3] #[1,2,3]
         },
         'stride': {
-            'values': [1,2,3]
+            'values': [1,2,3] #[1,2,3]
         },
         'padding': {
-            'values': [1,2,3]
+            'values': [1,2,3] #[1,2,3]
         },
         'pooling_size':{
-            'values': [1,2,4]
+            'values': [1,2,4] #[1,2,4]
         },
         'out_channels':{
-            'values': [16,32] # at least 2^max_num_conv layers
+            'values': [16,32] #[16,32] # at least 2^max_num_conv layers
         },
         'activation_fn': {
             'values': ['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid', 'Swish', 'Mish']
@@ -269,17 +311,25 @@ sweep_config = {
             'values': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal', 'Xavier_uniform', 'Xavier_normal']
         },
 
+        # Parameter for batchnorm on cnn_layers
+        'use_cnn_batchnorm': {
+            'values': [True, False] #[True, False]
+        },
+
         # Parameter for batchnorm on fc_layers
         'use_fc_batchnorm': {
-            'values': [True, False]
+            'values': [True, False] #[True, False]
         },
 
         # Parameters for optimizer
         'optimizer': {
-            'values': ['SGD', 'AdamW']
+            'values': ['SGD', 'Adam', 'AdamW', 'AdaGrad'] #['SGD', 'Adam', 'AdamW', 'AdaGrad']
         },
         'weight_decay': {
-            'values': [0, 1e-5, 1e-4, 1e-3, 1e-2]        
+            'values': [0, 1e-5, 1e-4, 1e-3, 1e-2] #[0, 1e-5, 1e-4, 1e-3, 1e-2]        
+        },
+        'momentum': {
+            'values': [0.7] #[0.7, 0.8, 0.9]        
         }
     }
 }

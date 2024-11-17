@@ -14,7 +14,7 @@ class CNN_97(nn.Module):
                  num_conv_layers=4,
                  conv_dropout=0.2, 
                  num_fc_layers=3, 
-                 kernel_size=5,
+                 kernel_size=(5, 5),
                  stride = 1, 
                  padding = 2,
                  pooling_size = 2,
@@ -33,7 +33,7 @@ class CNN_97(nn.Module):
         for _ in range(num_conv_layers):
             conv_layers.append(nn.Conv2d(in_channels=in_channels,
                                          out_channels=out_channels,
-                                         kernel_size=kernel_size,
+                                         kernel_size=(kernel_size[0], kernel_size[1]),
                                          stride=stride,
                                          padding=padding))
             conv_layers.append(nn.BatchNorm2d(out_channels))
@@ -45,8 +45,8 @@ class CNN_97(nn.Module):
             
             # this is just to track the sizes 
             # Update dimensions after convolution and pooling
-            height = (height + 2 * padding - kernel_size) // stride + 1  # Convolution output height
-            width = (width + 2 * padding - kernel_size) // stride + 1    # Convolution output width
+            height = (height + 2 * padding - kernel_size[0]) // stride + 1  # Convolution output height
+            width = (width + 2 * padding - kernel_size[1]) // stride + 1    # Convolution output width
             height, width = height // pooling_size, width // pooling_size  # After max pooling with kernel_size=2
 
         self.conv_layers = nn.Sequential(*conv_layers)
@@ -86,3 +86,22 @@ def weights_init_uniform_rule(m):
         y = 1.0/n**.5
         m.weight.data.uniform_(-y, y)
         m.bias.data.fill_(0)
+
+def weights_init(m, init_type):
+    classname = m.__class__.__name__
+    # for every Linear and convolutional layer in a model..
+    if classname.find('Linear') != -1 or classname.find('Conv2d') != -1:
+        if init_type == 'Xavier_uniform':
+            nn.init.xavier_uniform_(m.weight)
+        elif init_type == 'Xavier_normal':
+            nn.init.xavier_normal_(m.weight)
+        elif init_type == 'Kaiming_uniform':
+            nn.init.kaiming_uniform_(m.weight)
+        elif init_type == 'Kaiming_normal':
+            nn.init.kaiming_normal_(m.weight)
+        else:
+            weights_init_uniform_rule
+        
+        # check if module even has bias which is not None
+        if hasattr(m, 'bias') and m.bias is not None:
+            m.bias.data.fill_(0)

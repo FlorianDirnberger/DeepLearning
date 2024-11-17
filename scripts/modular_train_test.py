@@ -11,7 +11,7 @@ import os
 from custom_transforms import LoadSpectrogram, NormalizeSpectrogram, ToTensor, InterpolateSpectrogram
 from data_management import make_dataset_name
 #from models import SpectrVelCNNRegr, CNN_97, weights_init_uniform_rule
-from models import  CNN_97, weights_init_uniform_rule
+from models import CNN_97, weights_init_uniform_rule, weights_init
 
 # GROUP NUMBER
 GROUP_NUMBER = 97
@@ -73,9 +73,21 @@ def train():
             'ReLU': nn.ReLU,
             'LeakyReLU': nn.LeakyReLU,
             'Tanh': nn.Tanh,
-            'Sigmoid': nn.Sigmoid
+            'Sigmoid': nn.Sigmoid,
+            'Swish': nn.SiLU,
+            'Mish': nn.Mish
         }
-        
+        kernel_size_map = {
+            '3x3': (3, 3), 
+            '5x5': (5, 5),
+            '7x7': (7, 7), 
+            '1x3': (1, 3), 
+            '3x1': (3, 1), 
+            '3x5': (3, 5), 
+            '5x3': (5, 3), 
+            '3x7': (3, 7), 
+            '7x3': (7, 3)
+        }
 
         
 
@@ -85,7 +97,7 @@ def train():
             num_fc_layers=config.num_fc_layers,
             conv_dropout=config.conv_dropout,
             linear_dropout=config.linear_dropout,
-            kernel_size=config.kernel_size,
+            kernel_size=kernel_size_map[config.kernel_size],
             activation=activation_fn_map[config.activation_fn],
             hidden_units=config.hidden_units,
             padding = config.padding,
@@ -94,7 +106,28 @@ def train():
             out_channels = config.out_channels 
         ).to(DEVICE)
 
-        model.apply(weights_init_uniform_rule)
+        # Weight initializations depending on activation function
+        weights_init_map = {
+            'Uniform': lambda m: weights_init_uniform_rule(m),
+            'Xavier_uniform': lambda m: weights_init(m, init_type='Xavier_uniform'),
+            'Xavier_normal': lambda m: weights_init(m, init_type='Xavier_normal'),
+            'Kaiming_uniform': lambda m: weights_init(m, init_type='Kaiming_uniform'),
+            'Kaiming_normal': lambda m: weights_init(m, init_type='Kaiming_normal')
+        }
+        valid_activation_init_combinations = {
+            'ReLU': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal'],
+            'LeakyReLU': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal'],
+            'Tanh': ['Uniform', 'Xavier_uniform', 'Xavier_normal'],
+            'Sigmoid': ['Uniform', 'Xavier_uniform', 'Xavier_normal'],
+            'Swish': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal'],
+            'Mish': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal']
+        }
+        if config.weights_init not in valid_activation_init_combinations[config.activation_fn]:
+            #print(f"Invalid combination: {config.activation_fn} + {config.weights_init}") # debugging
+            return # skips the current run
+
+        model.apply(weights_init_map[config.weights_init])
+
         optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=0.9)
         loss_fn = model.loss_fn
 
@@ -181,13 +214,13 @@ sweep_config = {
             'values': [0.1, 0.3, 0.5]
         },
         'kernel_size': {
-            'values': [3, 5, 7]
+            'values': ['3x3', '5x5', '7x7', '1x3', '3x1', '3x5', '5x3', '3x7', '7x3']
         },
         'hidden_units': {
             'values': [64, 128, 256]
         },
         'learning_rate': {
-            'values': [1e-4, 1e-5, 1e-6]
+            'values': [1e-3, 1e-4, 1e-5, 1e-6]
         },
         'epochs': {
             'values': [10, 20, 50]
@@ -196,7 +229,7 @@ sweep_config = {
             'values': [16, 32, 64]
         },
         'num_conv_layers':{
-            'values':[1,2,3]
+            'values': [1,2,3]
         },
         'num_fc_layers':{
             'values': [1,2,3]
@@ -214,7 +247,10 @@ sweep_config = {
             'values': [16,32] # at least 2^max_num_conv layers
         },
         'activation_fn': {
-            'values': ['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid']
+            'values': ['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid', 'Swish', 'Mish']
+        },
+        'weights_init': {
+            'values': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal', 'Xavier_uniform', 'Xavier_normal']
         }
     }
 }

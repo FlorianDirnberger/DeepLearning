@@ -123,8 +123,9 @@ def train():
             'Mish': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal']
         }
         if config.weights_init not in valid_activation_init_combinations[config.activation_fn]:
+            #print(f"Invalid combination: {config.activation_fn} + {config.weights_init}") # debugging
             return # skips the current run
-            
+
         model.apply(weights_init_map[config.weights_init])
 
         optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=0.9)
@@ -225,7 +226,7 @@ sweep_config = {
             'values': [10, 20, 50]
         },
         'batch_size': {
-            'values': [[16, 32, 64]
+            'values': [16, 32, 64]
         },
         'num_conv_layers':{
             'values': [1,2,3]

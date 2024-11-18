@@ -139,6 +139,7 @@ def train():
             'AdaGrad': torch.optim.Adagrad
         }
 
+        '''
         # To avoid redundant runs
         valid_optimizer_weight_decay_combinations = {
             'SGD': sweep_config['parameters']['weight_decay']['values'],
@@ -153,6 +154,7 @@ def train():
             'AdamW': [sweep_config['parameters']['momentum']['values'][0]],
             'AdaGrad': [sweep_config['parameters']['momentum']['values'][0]]
         }
+        
 
         if config.weight_decay not in valid_optimizer_weight_decay_combinations[config.optimizer]:
             print(f"Invalid combination: {config.optimizer} + {config.weight_decay}")
@@ -161,6 +163,8 @@ def train():
         if config.momentum not in valid_optimizer_momentum_combinations[config.optimizer]:
             print(f"Invalid combination: {config.optimizer} + {config.weight_decay} + {config.momentum}")
             return # skips the current run
+        
+        '''
 
         if config.optimizer == 'SGD':
             optimizer_params = {
@@ -258,81 +262,85 @@ def train():
 
 # WandB Sweep Configuration
 sweep_config = {
-    'method': 'grid',  # Specifies grid search to try all configurations
-    
-    'metric': 
-        {'name': 'test_rmse', 'goal': 'minimize'}
-    ,
-    
+    'method': 'bayes',  # Specifies Bayesian optimization
+    'metric': {
+        'name': 'test_rmse',
+        'goal': 'minimize'
+    },
     'parameters': {
         'conv_dropout': {
-            'values': [0.1, 0.3] #[0.1, 0.3, 0.5]
+            'distribution': 'uniform',
+            'min': 0,
+            'max': 0.5  # Adjusted to a continuous range for Bayesian optimization
         },
         'linear_dropout': {
-            'values': [0.1, 0.3] #[0.1, 0.3, 0.5]
+            'distribution': 'uniform',
+            'min': 0,
+            'max': 0.5
         },
         'kernel_size': {
-            'values': ['3x3', '5x5']
+            'values': ['3x3', '5x5']  # Discrete values remain unchanged
         },
         'hidden_units': {
-            'values': [64, 128] #[64, 128, 256]
+            'values': [64, 128, 256]  # Expanded discrete set
         },
         'learning_rate': {
-            'values': [ 1e-4, 1e-5]
+            'distribution': 'log_uniform',
+            'min': 1e-4,
+            'max': 1e-5  # Continuous log scale for learning rate
         },
         'epochs': {
-            'values': [250] #[10, 20, 50]
+            'values': [1, 5, 10]  # Discrete options for epochs
         },
         'batch_size': {
-            'values': [32, 64] #[16, 32, 64]
+            'values': [16, 32, 64]  # Discrete options for batch size
         },
-        'num_conv_layers':{
-            'values': [2,3]
+        'num_conv_layers': {
+            'values': [2, 3, 4]  # Adjusted for possible variations
         },
-        'num_fc_layers':{
-            'values': [2,3] #[1,2,3]
+        'num_fc_layers': {
+            'values': [1, 2, 3]
         },
         'stride': {
-            'values': [0,1] #[1,2,3]
+            'values': [1, 2]  # Discrete set for strides
         },
         'padding': {
-            'values': [0,1] #[1,2,3]
+            'values': [1, 2]
         },
-        'pooling_size':{
-            'values': [1,2] #[1,2,4]
+        'pooling_size': {
+            'values': [1, 2, 4]
         },
-        'out_channels':{
-            'values': [16,32] #[16,32] # at least 2^max_num_conv layers
+        'out_channels': {
+            'values': [16, 32, 64]
         },
         'activation_fn': {
             'values': ['ReLU', 'LeakyReLU']
         },
         'weights_init': {
-            'values': [ 'Kaiming_uniform', 'Kaiming_normal']
+            'values': ['Kaiming_uniform', 'Kaiming_normal']
         },
-
-        # Parameter for batchnorm on cnn_layers
         'use_cnn_batchnorm': {
-            'values': [True, False] #[True, False]
+            'values': [True, False]
         },
-
-        # Parameter for batchnorm on fc_layers
         'use_fc_batchnorm': {
-            'values': [True, False] #[True, False]
+            'values': [True, False]
         },
-
-        # Parameters for optimizer
         'optimizer': {
-            'values': ['SGD', 'AdamW'] #['SGD', 'Adam', 'AdamW', 'AdaGrad']
+            'values': ['SGD', 'AdamW']
         },
         'weight_decay': {
-            'values': [0, 1e-5] #[0, 1e-5, 1e-4, 1e-3, 1e-2]        
+            'distribution': 'log_uniform',
+            'min': 0,
+            'max': 1e-3  # Log scale for weight decay
         },
         'momentum': {
-            'values': [0.5, 0.9] #[0.7, 0.8, 0.9]        
+            'distribution': 'uniform',
+            'min': 0.5,
+            'max': 0.9  # Continuous range for momentum
         }
     }
 }
+
 
 if __name__ == "__main__":
     # Initialize the sweep in WandB

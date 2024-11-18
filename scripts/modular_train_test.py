@@ -24,7 +24,14 @@ STMF_FILENAME = "stmf_data_3.csv"
 NFFT = 512
 TS_CROPTWIDTH = (-150, 200)
 VR_CROPTWIDTH = (-60, 15)
-DEVICE = "cpu"
+#DEVICE = "cpu"
+DEVICE = (
+    "cuda"
+    if torch.cuda.is_available()
+    else "mps"
+    if torch.backends.mps.is_available()
+    else "cpu"
+)
 
 
 # Load environment variables from .env file
@@ -235,16 +242,19 @@ def train():
             test_rmse = avg_test_loss ** 0.5
             #log_test_rmse = torch.log10(test_rmse)
 
+            total_params = sum(p.numel() for p in model().parameters())
+
             print(f'LOSS train {avg_loss} ; LOSS test {avg_test_loss}')
             
             # log metrics to wandb
             wandb.log({
-                "loss": avg_loss,
-                "rmse": rmse,
+                "train_loss": avg_loss,
+                "train_rmse": rmse,
                 #"log_rmse": log_rmse,
-                "test_loss": avg_test_loss,
-                "test_rmse": test_rmse,
+                "validation_loss": avg_test_loss,
+                "validation_rmse": test_rmse,
                 #"log_test_rmse": log_test_rmse,
+                "total_parameter": total_params
             })
 
             # Track best performance, and save the model's state
@@ -266,22 +276,22 @@ sweep_config = {
     
     'parameters': {
         'conv_dropout': {
-            'values': [0.1, 0.3] #[0.1, 0.3, 0.5]
+            'values': [0, 0.3] #[0.1, 0.3, 0.5]
         },
         'linear_dropout': {
-            'values': [0.1, 0.3] #[0.1, 0.3, 0.5]
+            'values': [0] #[0.1, 0.3, 0.5]
         },
         'kernel_size': {
-            'values': ['3x3', '5x5']
+            'values': ['3x3']
         },
         'hidden_units': {
-            'values': [64, 128] #[64, 128, 256]
+            'values': [32, 128] #[64, 128, 256]
         },
         'learning_rate': {
-            'values': [ 1e-4, 1e-5]
+            'values': [1e-4, 1e-5]
         },
         'epochs': {
-            'values': [250] #[10, 20, 50]
+            'values': [50] #[10, 20, 50]
         },
         'batch_size': {
             'values': [32, 64] #[16, 32, 64]
@@ -290,35 +300,35 @@ sweep_config = {
             'values': [2,3]
         },
         'num_fc_layers':{
-            'values': [2,3] #[1,2,3]
+            'values': [2] #[1,2,3]
         },
         'stride': {
-            'values': [0,1] #[1,2,3]
+            'values': [1] #[1,2,3]
         },
         'padding': {
-            'values': [0,1] #[1,2,3]
+            'values': [1] #[1,2,3]
         },
         'pooling_size':{
-            'values': [1,2] #[1,2,4]
+            'values': [2] #[1,2,4]
         },
         'out_channels':{
             'values': [16,32] #[16,32] # at least 2^max_num_conv layers
         },
         'activation_fn': {
-            'values': ['ReLU', 'LeakyReLU']
+            'values': ['ReLU']
         },
         'weights_init': {
-            'values': [ 'Kaiming_uniform', 'Kaiming_normal']
+            'values': ['Kaiming_normal']
         },
 
         # Parameter for batchnorm on cnn_layers
         'use_cnn_batchnorm': {
-            'values': [True, False] #[True, False]
+            'values': [True] #[True, False]
         },
 
         # Parameter for batchnorm on fc_layers
         'use_fc_batchnorm': {
-            'values': [True, False] #[True, False]
+            'values': [True] #[True, False]
         },
 
         # Parameters for optimizer
@@ -329,7 +339,7 @@ sweep_config = {
             'values': [0, 1e-5] #[0, 1e-5, 1e-4, 1e-3, 1e-2]        
         },
         'momentum': {
-            'values': [0.5, 0.9] #[0.7, 0.8, 0.9]        
+            'values': [0.9] #[0.7, 0.8, 0.9]        
         }
     }
 }

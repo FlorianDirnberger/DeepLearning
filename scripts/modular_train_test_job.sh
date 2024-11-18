@@ -1,6 +1,6 @@
 #!/bin/sh
 #BSUB -q gpua100
-#BSUB -J MULT
+#BSUB -J bayes_sweep
 ### number of core
 #BSUB -n 4
 ### specify that all cores should be on the same host
@@ -8,7 +8,7 @@
 ### specify the memory needed
 #BSUB -R "rusage[mem=10GB]"
 ### Number of hours needed
-#BSUB -W 23:59
+#BSUB -W 100:00
 ### added outputs and errors to files
 #BSUB -o outputs/Output_%J.out
 #BSUB -e outputs/Error_%J.err

@@ -22,6 +22,8 @@ class CNN_97(nn.Module):
                  activation=nn.ReLU,
                  hidden_units=1024,
                  out_channels = 16, # Starting output channels for the first conv layer
+                 use_fc_batchnorm=True,
+                 use_cnn_batchnorm=True,
                  input_shape=(6, 74, 918)):
         super().__init__()
         
@@ -36,7 +38,8 @@ class CNN_97(nn.Module):
                                          kernel_size=(kernel_size[0], kernel_size[1]),
                                          stride=stride,
                                          padding=padding))
-            conv_layers.append(nn.BatchNorm2d(out_channels))
+            if use_cnn_batchnorm:  # Add BatchNorm2d if enabled
+                conv_layers.append(nn.BatchNorm2d(out_channels))
             conv_layers.append(activation())
             conv_layers.append(nn.MaxPool2d(kernel_size=pooling_size))
             conv_layers.append(nn.Dropout(conv_dropout))
@@ -59,6 +62,8 @@ class CNN_97(nn.Module):
         fc_layers = []
         for i in range(num_fc_layers - 1):
             fc_layers.append(nn.Linear(input_dim, hidden_units))
+            if use_fc_batchnorm:  # Add BatchNorm1d if enabled
+                fc_layers.append(nn.BatchNorm1d(hidden_units))
             fc_layers.append(activation())
             fc_layers.append(nn.Dropout(linear_dropout))
             input_dim = hidden_units  # Update for the next layer

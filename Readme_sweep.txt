@@ -35,3 +35,41 @@ lr_scheduler: [None, Step, Exponential] # Gives additional hyperparameter to mom
 weight_init [random]
 
 
+batchnorm on fc_layers:     [True, False]
+batchnorm on cnn_layers:    [True, False]
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+INITIAL IDEA FOR OPTIMIZER:
+----------------------------------------------------------------------------------------------------------------------------------------
+optimizer:  SGD + weight decay + momentum                       # can handel large data sets effectively,
+                                                                # regularization (weight_decay): prevents overfitting (1e-5, 1e-4, 1e-3),
+                                                                # momentum accelerates SGD to find minimum (between 0.5 and 0.99),
+            
+            Adam                                                # works for a wide range of models
+                                                                # weight decay is incorporated into the gradient update step
+                                                                # - can lead to wrong regularization, better AdamW
+            
+            AdamW (incorporats weight_decay)                    # more effective and stable when regularization should be applied
+                                                                # decouples weight decay from the optimization steps 
+                                                                # and directly applies the regularization to the weights
+                                                                # weight_decay in [1e-5,1e-1]
+            
+            AdaGrad                                             # learning rate is adjusted automatically 
+                                                                # - smaller for frequently occurring features, larger for infrequent features
+                                                                # good for data with sparse features 
+                                                                # maybe good for our case because we just want to finde one point (initial velocity),
+                                                                # but I'm not sure if that is what meant by sparse data
+
+weight_decay:   [1e-5, 1e-1], [0, 1e-5, 1e-4, 1e-3, 1e-2]       # prevents overfitting (can be adapted with SGD and AdamW)
+                                                                # Didn't choose: 1e-1 (very strong regularization probably not necessary)
+
+momentum:       (0,1),         [0.7, 0.8, 0.9]            # smaller values leads to noisy updates, that's why values are choosen like this
+
+---------------------------------------------------------------------------------------------------------------------------------------
+Implemented:
+----------------------------------------------------------------------------------------------------------------------------------------
+optimizer: [SGD, Adam, AdamW, AdaGrad]                         # optimizer uses weight_decay/momentum as mentioned above 
+weight_decay: [0, 1e-5, 1e-4, 1e-3, 1e-2]                      # choosen parameter
+momentum: [0.7, 0.8, 0.9]
+

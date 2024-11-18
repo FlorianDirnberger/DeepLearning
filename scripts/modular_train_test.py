@@ -24,7 +24,14 @@ STMF_FILENAME = "stmf_data_3.csv"
 NFFT = 512
 TS_CROPTWIDTH = (-150, 200)
 VR_CROPTWIDTH = (-60, 15)
-DEVICE = "cpu"
+#DEVICE = "cpu"
+
+DEVICE = ("cuda"
+          if torch.cuda.is_available()
+          else "mps"
+          if torch.backends.mps.is_available()
+          else "cpu"
+          )
 
 
 # Load environment variables from .env file
@@ -246,8 +253,8 @@ def train():
                 "loss": avg_loss,
                 "rmse": rmse,
                 #"log_rmse": log_rmse,
-                "test_loss": avg_test_loss,
-                "test_rmse": test_rmse,
+                "val_loss": avg_test_loss,
+                "val_rmse": test_rmse,
                 #"log_test_rmse": log_test_rmse,
             })
 
@@ -264,7 +271,7 @@ def train():
 sweep_config = {
     'method': 'bayes',  # Specifies Bayesian optimization
     'metric': {
-        'name': 'test_rmse',
+        'name': 'val_rmse',
         'goal': 'minimize'
     },
     'parameters': {
@@ -282,15 +289,15 @@ sweep_config = {
             'values': ['3x3', '5x5']  # Discrete values remain unchanged
         },
         'hidden_units': {
-            'values': [64, 128, 256]  # Expanded discrete set
+            'values': [32, 64, 128]  # Expanded discrete set
         },
         'learning_rate': {
             'distribution': 'log_uniform',
-            'min': 1e-4,
-            'max': 1e-5  # Continuous log scale for learning rate
+            'min': 1e-5,
+            'max': 1e-4  # Continuous log scale for learning rate
         },
         'epochs': {
-            'values': [1, 5, 10]  # Discrete options for epochs
+            'values': [50]  # Discrete options for epochs
         },
         'batch_size': {
             'values': [16, 32, 64]  # Discrete options for batch size
@@ -335,7 +342,7 @@ sweep_config = {
         },
         'momentum': {
             'distribution': 'uniform',
-            'min': 0.5,
+            'min': 0.6,
             'max': 0.9  # Continuous range for momentum
         }
     }

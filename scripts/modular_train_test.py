@@ -297,7 +297,7 @@ sweep_config = {
             'max': 1e-4  # Continuous log scale for learning rate
         },
         'epochs': {
-            'values': [50]  # Discrete options for epochs
+            'values': [20]  # Discrete options for epochs
         },
         'batch_size': {
             'values': [16, 32, 64]  # Discrete options for batch size

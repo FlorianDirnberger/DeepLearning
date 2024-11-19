@@ -254,7 +254,7 @@ def train():
                 "validation_loss": avg_test_loss,
                 "validation_rmse": validation_rmse,
                 #"log_validation_rmse": log_validation_rmse,
-                "total_parameter": total_params
+                #"total_parameter": total_params
             })
 
             # Track best performance, and save the model's state

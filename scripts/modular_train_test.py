@@ -165,7 +165,7 @@ def train():
                 
             if test_rmse > 8:
                 exceed_rmse_count += 1
-                if exceed_rmse_count >= 10:
+                if exceed_rmse_count >= 8:
                     print("Test RMSE exceeded 8 for 10 consecutive epochs. Ending training early.")
                     break
             else:
@@ -200,7 +200,7 @@ sweep_config = {
             'values': [1e-4, 1e-5, 1e-6]
         },
         'epochs': {
-            'values': [50]
+            'values': [20]
         },
         'batch_size': {
             'values': [16, 32, 64]

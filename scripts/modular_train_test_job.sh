@@ -1,6 +1,6 @@
 #!/bin/sh
 #BSUB -q gpua100
-#BSUB -J Sweep JARF
+#BSUB -J Sweep_JARF
 ### number of core
 #BSUB -n 4
 ### specify that all cores should be on the same host
@@ -17,5 +17,5 @@ echo "Running script..."
 
 module load cuda/11.8
 module load python3/3.10.13
-source ~/DL/p4_velocity/DL_97_venv/bin/activate # Update this path to reflect your venv name
-python3 ~/DL/p4_velocity/git/DeepLearning97/scripts/modular_train_test.py > log/modular_train_test$(date +"%d-%m-%y")_$(date +'%H:%M:%S').log
+source ~/my_project_dir/02456_grp_99_venv/bin/activate
+python3 ~/my_project_dir/DeepLearning97/scripts/modular_train_test.py > log/modular_train_test$(date +"%d-%m-%y")_$(date +'%H:%M:%S').log

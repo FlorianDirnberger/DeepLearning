@@ -239,10 +239,10 @@ def train():
                     running_test_loss += test_loss.item()
 
             avg_test_loss = running_test_loss / (i + 1)
-            test_rmse = avg_test_loss ** 0.5
-            #log_test_rmse = torch.log10(test_rmse)
+            validation_rmse = avg_test_loss ** 0.5
+            #log_validation_rmse = torch.log10(validation_rmse)
 
-            total_params = sum(p.numel() for p in model().parameters())
+            #total_params = sum(p.numel() for p in model().parameters())
 
             print(f'LOSS train {avg_loss} ; LOSS test {avg_test_loss}')
             
@@ -252,8 +252,8 @@ def train():
                 "train_rmse": rmse,
                 #"log_rmse": log_rmse,
                 "validation_loss": avg_test_loss,
-                "validation_rmse": test_rmse,
-                #"log_test_rmse": log_test_rmse,
+                "validation_rmse": validation_rmse,
+                #"log_validation_rmse": log_validation_rmse,
                 "total_parameter": total_params
             })
 
@@ -271,7 +271,7 @@ sweep_config = {
     'method': 'grid',  # Specifies grid search to try all configurations
     
     'metric': 
-        {'name': 'test_rmse', 'goal': 'minimize'}
+        {'name': 'validation_rmse', 'goal': 'minimize'}
     ,
     
     'parameters': {
@@ -312,7 +312,7 @@ sweep_config = {
             'values': [2] #[1,2,4]
         },
         'out_channels':{
-            'values': [16,32] #[16,32] # at least 2^max_num_conv layers
+            'values': [8,16] #[16,32] # at least 2^max_num_conv layers
         },
         'activation_fn': {
             'values': ['ReLU']

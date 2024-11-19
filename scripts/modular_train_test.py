@@ -221,6 +221,8 @@ def train():
 
         # Training Loop
         best_vloss = float('inf')
+        exceed_rmse_count = 0  # Counter for consecutive epochs with test_rmse > 8
+        best_vloss = float('inf')
         for epoch in range(config.epochs):
             print(f'EPOCH {epoch + 1}:')
             model.train(True)
@@ -256,13 +258,20 @@ def train():
                 #"log_validation_rmse": log_validation_rmse,
                 #"total_parameter": total_params
             })
-
             # Track best performance, and save the model's state
             if avg_test_loss < best_vloss:
                 best_vloss = avg_test_loss
                 model_path = MODEL_DIR / f"model_{model.__class__.__name__}_{wandb.run.name}"
                 torch.save(model.state_dict(), model_path)
-
+                
+            if validation_rmse > 8:
+                exceed_rmse_count += 1
+                if exceed_rmse_count >= 10:
+                    print("Test RMSE exceeded 8 for 10 consecutive epochs. Ending training early.")
+                    break
+            else:
+                exceed_rmse_count = 0  # Reset counter if condition is not met
+          
     # Ensure that each run is properly finished
     #wandb.finish()
 

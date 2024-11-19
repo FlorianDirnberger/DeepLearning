@@ -1,0 +1,409 @@
+Loaded module: cuda/11.8
+Loaded dependency [python3/3.10.13]: sqlite3/3.45.1
+Loaded dependency [python3/3.10.13]: gcc/12.3.0-binutils-2.40
+Loaded module: python3/3.10.13
+
+Loading python3/3.10.13
+  Loading requirement: sqlite3/3.45.1 gcc/12.3.0-binutils-2.40
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: s232735 (s232735-danmarks-tekniske-universitet-dtu). Use `wandb login --relogin` to force relogin
+wandb: Appending key for api.wandb.ai to your netrc file: /zhome/cf/5/202847/.netrc
+wandb: Agent Starting Run: dqalqybf with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 50
+wandb: 	hidden_units: 32
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 2
+wandb: 	num_fc_layers: 2
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 8
+wandb: 	padding: 1
+wandb: 	pooling_size: 2
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 0
+wandb: 	weights_init: Kaiming_normal
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/cf/5/202847/my_project_dir/DeepLearning97/wandb/run-20241119_150036-dqalqybf
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run usual-sweep-1
+wandb: ⭐️ View project at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/sweeps/5l5ozy6d
+wandb: 🚀 View run at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/runs/dqalqybf
+Traceback (most recent call last):
+  File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+    if test_rmse > 8:
+NameError: name 'test_rmse' is not defined
+wandb: - 0.005 MB of 0.005 MB uploadedwandb: \ 0.006 MB of 0.006 MB uploadedwandb: | 0.006 MB of 0.006 MB uploadedwandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb:      train_loss ▁
+wandb:      train_rmse ▁
+wandb: validation_loss ▁
+wandb: validation_rmse ▁
+wandb: 
+wandb: Run summary:
+wandb:      train_loss 634.24627
+wandb:      train_rmse 25.18425
+wandb: validation_loss 49.05107
+wandb: validation_rmse 7.00365
+wandb: 
+wandb: 🚀 View run usual-sweep-1 at: https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/runs/dqalqybf
+wandb: ⭐️ View project at: https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 4 W&B file(s), 0 media file(s), 3 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241119_150036-dqalqybf/logs
+Run dqalqybf errored:
+Traceback (most recent call last):
+  File "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/lib64/python3.9/site-packages/wandb/agents/pyagent.py", line 306, in _run_job
+    self._function()
+  File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+    if test_rmse > 8:
+NameError: name 'test_rmse' is not defined
+
+wandb: ERROR Run dqalqybf errored:
+wandb: ERROR Traceback (most recent call last):
+wandb: ERROR   File "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/lib64/python3.9/site-packages/wandb/agents/pyagent.py", line 306, in _run_job
+wandb: ERROR     self._function()
+wandb: ERROR   File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+wandb: ERROR     if test_rmse > 8:
+wandb: ERROR NameError: name 'test_rmse' is not defined
+wandb: ERROR 
+wandb: Agent Starting Run: 240866vv with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 50
+wandb: 	hidden_units: 32
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 2
+wandb: 	num_fc_layers: 2
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 8
+wandb: 	padding: 1
+wandb: 	pooling_size: 2
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Kaiming_normal
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/cf/5/202847/my_project_dir/DeepLearning97/wandb/run-20241119_150138-240866vv
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run golden-sweep-2
+wandb: ⭐️ View project at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/sweeps/5l5ozy6d
+wandb: 🚀 View run at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/runs/240866vv
+Traceback (most recent call last):
+  File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+    if test_rmse > 8:
+NameError: name 'test_rmse' is not defined
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb:      train_loss ▁
+wandb:      train_rmse ▁
+wandb: validation_loss ▁
+wandb: validation_rmse ▁
+wandb: 
+wandb: Run summary:
+wandb:      train_loss 710.06614
+wandb:      train_rmse 26.64707
+wandb: validation_loss 163.80992
+wandb: validation_rmse 12.79882
+wandb: 
+wandb: 🚀 View run golden-sweep-2 at: https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/runs/240866vv
+wandb: ⭐️ View project at: https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241119_150138-240866vv/logs
+Run 240866vv errored:
+Traceback (most recent call last):
+  File "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/lib64/python3.9/site-packages/wandb/agents/pyagent.py", line 306, in _run_job
+    self._function()
+  File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+    if test_rmse > 8:
+NameError: name 'test_rmse' is not defined
+
+wandb: ERROR Run 240866vv errored:
+wandb: ERROR Traceback (most recent call last):
+wandb: ERROR   File "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/lib64/python3.9/site-packages/wandb/agents/pyagent.py", line 306, in _run_job
+wandb: ERROR     self._function()
+wandb: ERROR   File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+wandb: ERROR     if test_rmse > 8:
+wandb: ERROR NameError: name 'test_rmse' is not defined
+wandb: ERROR 
+wandb: Agent Starting Run: em4z40jh with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 50
+wandb: 	hidden_units: 32
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 2
+wandb: 	num_fc_layers: 2
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 16
+wandb: 	padding: 1
+wandb: 	pooling_size: 2
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 0
+wandb: 	weights_init: Kaiming_normal
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/cf/5/202847/my_project_dir/DeepLearning97/wandb/run-20241119_150154-em4z40jh
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run avid-sweep-3
+wandb: ⭐️ View project at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/sweeps/5l5ozy6d
+wandb: 🚀 View run at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/runs/em4z40jh
+Traceback (most recent call last):
+  File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+    if test_rmse > 8:
+NameError: name 'test_rmse' is not defined
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb:      train_loss ▁
+wandb:      train_rmse ▁
+wandb: validation_loss ▁
+wandb: validation_rmse ▁
+wandb: 
+wandb: Run summary:
+wandb:      train_loss 631.77224
+wandb:      train_rmse 25.13508
+wandb: validation_loss 18.31718
+wandb: validation_rmse 4.27986
+wandb: 
+wandb: 🚀 View run avid-sweep-3 at: https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/runs/em4z40jh
+wandb: ⭐️ View project at: https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241119_150154-em4z40jh/logs
+Run em4z40jh errored:
+Traceback (most recent call last):
+  File "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/lib64/python3.9/site-packages/wandb/agents/pyagent.py", line 306, in _run_job
+    self._function()
+  File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+    if test_rmse > 8:
+NameError: name 'test_rmse' is not defined
+
+wandb: ERROR Run em4z40jh errored:
+wandb: ERROR Traceback (most recent call last):
+wandb: ERROR   File "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/lib64/python3.9/site-packages/wandb/agents/pyagent.py", line 306, in _run_job
+wandb: ERROR     self._function()
+wandb: ERROR   File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+wandb: ERROR     if test_rmse > 8:
+wandb: ERROR NameError: name 'test_rmse' is not defined
+wandb: ERROR 
+wandb: Agent Starting Run: pa2x9nok with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 50
+wandb: 	hidden_units: 32
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 2
+wandb: 	num_fc_layers: 2
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 16
+wandb: 	padding: 1
+wandb: 	pooling_size: 2
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Kaiming_normal
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/cf/5/202847/my_project_dir/DeepLearning97/wandb/run-20241119_150210-pa2x9nok
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run royal-sweep-4
+wandb: ⭐️ View project at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/sweeps/5l5ozy6d
+wandb: 🚀 View run at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/runs/pa2x9nok
+Traceback (most recent call last):
+  File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+    if test_rmse > 8:
+NameError: name 'test_rmse' is not defined
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb:      train_loss ▁
+wandb:      train_rmse ▁
+wandb: validation_loss ▁
+wandb: validation_rmse ▁
+wandb: 
+wandb: Run summary:
+wandb:      train_loss 721.04505
+wandb:      train_rmse 26.85228
+wandb: validation_loss 53.22511
+wandb: validation_rmse 7.29555
+wandb: 
+wandb: 🚀 View run royal-sweep-4 at: https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/runs/pa2x9nok
+wandb: ⭐️ View project at: https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241119_150210-pa2x9nok/logs
+Run pa2x9nok errored:
+Traceback (most recent call last):
+  File "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/lib64/python3.9/site-packages/wandb/agents/pyagent.py", line 306, in _run_job
+    self._function()
+  File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+    if test_rmse > 8:
+NameError: name 'test_rmse' is not defined
+
+wandb: ERROR Run pa2x9nok errored:
+wandb: ERROR Traceback (most recent call last):
+wandb: ERROR   File "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/lib64/python3.9/site-packages/wandb/agents/pyagent.py", line 306, in _run_job
+wandb: ERROR     self._function()
+wandb: ERROR   File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+wandb: ERROR     if test_rmse > 8:
+wandb: ERROR NameError: name 'test_rmse' is not defined
+wandb: ERROR 
+wandb: Agent Starting Run: p0xya72p with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 50
+wandb: 	hidden_units: 32
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 2
+wandb: 	num_fc_layers: 2
+wandb: 	optimizer: AdamW
+wandb: 	out_channels: 8
+wandb: 	padding: 1
+wandb: 	pooling_size: 2
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 0
+wandb: 	weights_init: Kaiming_normal
+wandb: - Waiting for wandb.init()...wandb: \ Waiting for wandb.init()...wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/cf/5/202847/my_project_dir/DeepLearning97/wandb/run-20241119_150225-p0xya72p
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run zesty-sweep-5
+wandb: ⭐️ View project at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/sweeps/5l5ozy6d
+wandb: 🚀 View run at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/runs/p0xya72p
+Traceback (most recent call last):
+  File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+    if test_rmse > 8:
+NameError: name 'test_rmse' is not defined
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb:      train_loss ▁
+wandb:      train_rmse ▁
+wandb: validation_loss ▁
+wandb: validation_rmse ▁
+wandb: 
+wandb: Run summary:
+wandb:      train_loss 947.73755
+wandb:      train_rmse 30.78535
+wandb: validation_loss 961.94183
+wandb: validation_rmse 31.01519
+wandb: 
+wandb: 🚀 View run zesty-sweep-5 at: https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/runs/p0xya72p
+wandb: ⭐️ View project at: https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241119_150225-p0xya72p/logs
+Run p0xya72p errored:
+Traceback (most recent call last):
+  File "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/lib64/python3.9/site-packages/wandb/agents/pyagent.py", line 306, in _run_job
+    self._function()
+  File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+    if test_rmse > 8:
+NameError: name 'test_rmse' is not defined
+
+wandb: ERROR Run p0xya72p errored:
+wandb: ERROR Traceback (most recent call last):
+wandb: ERROR   File "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/lib64/python3.9/site-packages/wandb/agents/pyagent.py", line 306, in _run_job
+wandb: ERROR     self._function()
+wandb: ERROR   File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+wandb: ERROR     if test_rmse > 8:
+wandb: ERROR NameError: name 'test_rmse' is not defined
+wandb: ERROR 
+wandb: Agent Starting Run: 9uuqlzxr with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 50
+wandb: 	hidden_units: 32
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 2
+wandb: 	num_fc_layers: 2
+wandb: 	optimizer: AdamW
+wandb: 	out_channels: 8
+wandb: 	padding: 1
+wandb: 	pooling_size: 2
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Kaiming_normal
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/cf/5/202847/my_project_dir/DeepLearning97/wandb/run-20241119_150241-9uuqlzxr
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run olive-sweep-6
+wandb: ⭐️ View project at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/sweeps/5l5ozy6d
+wandb: 🚀 View run at https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/runs/9uuqlzxr
+Traceback (most recent call last):
+  File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+    if test_rmse > 8:
+NameError: name 'test_rmse' is not defined
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb:      train_loss ▁
+wandb:      train_rmse ▁
+wandb: validation_loss ▁
+wandb: validation_rmse ▁
+wandb: 
+wandb: Run summary:
+wandb:      train_loss 952.40094
+wandb:      train_rmse 30.86099
+wandb: validation_loss 923.08203
+wandb: validation_rmse 30.38227
+wandb: 
+wandb: 🚀 View run olive-sweep-6 at: https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097/runs/9uuqlzxr
+wandb: ⭐️ View project at: https://wandb.ai/s232735-danmarks-tekniske-universitet-dtu/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241119_150241-9uuqlzxr/logs
+Run 9uuqlzxr errored:
+Traceback (most recent call last):
+  File "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/lib64/python3.9/site-packages/wandb/agents/pyagent.py", line 306, in _run_job
+    self._function()
+  File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+    if test_rmse > 8:
+NameError: name 'test_rmse' is not defined
+
+wandb: ERROR Run 9uuqlzxr errored:
+wandb: ERROR Traceback (most recent call last):
+wandb: ERROR   File "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/lib64/python3.9/site-packages/wandb/agents/pyagent.py", line 306, in _run_job
+wandb: ERROR     self._function()
+wandb: ERROR   File "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py", line 267, in train
+wandb: ERROR     if test_rmse > 8:
+wandb: ERROR NameError: name 'test_rmse' is not defined
+wandb: ERROR 
+Detected 5 failed runs in a row at start, killing sweep.
+wandb: ERROR Detected 5 failed runs in a row at start, killing sweep.
+wandb: To change this value set WANDB_AGENT_MAX_INITIAL_FAILURES=val

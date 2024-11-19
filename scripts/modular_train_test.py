@@ -293,7 +293,7 @@ sweep_config = {
         },
         'learning_rate': {
             'distribution': 'log_uniform',
-            'min': 1e-5,
+            'min': 1e-6,
             'max': 1e-4  # Continuous log scale for learning rate
         },
         'epochs': {

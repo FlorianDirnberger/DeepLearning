@@ -11,7 +11,7 @@ import os
 from custom_transforms import LoadSpectrogram, NormalizeSpectrogram, ToTensor, InterpolateSpectrogram
 from data_management import make_dataset_name
 #from models import SpectrVelCNNRegr, CNN_97, weights_init_uniform_rule
-from models import CNN_97, weights_init_uniform_rule, weights_init
+from models import  CNN_97, weights_init_uniform_rule
 
 # GROUP NUMBER
 GROUP_NUMBER = 97
@@ -24,14 +24,7 @@ STMF_FILENAME = "stmf_data_3.csv"
 NFFT = 512
 TS_CROPTWIDTH = (-150, 200)
 VR_CROPTWIDTH = (-60, 15)
-#DEVICE = "cpu"
-
-DEVICE = ("cuda"
-          if torch.cuda.is_available()
-          else "mps"
-          if torch.backends.mps.is_available()
-          else "cpu"
-          )
+DEVICE = "cpu"
 
 
 # Load environment variables from .env file
@@ -80,21 +73,9 @@ def train():
             'ReLU': nn.ReLU,
             'LeakyReLU': nn.LeakyReLU,
             'Tanh': nn.Tanh,
-            'Sigmoid': nn.Sigmoid,
-            'Swish': nn.SiLU,
-            'Mish': nn.Mish
+            'Sigmoid': nn.Sigmoid
         }
-        kernel_size_map = {
-            '3x3': (3, 3), 
-            '5x5': (5, 5),
-            '7x7': (7, 7), 
-            '1x3': (1, 3), 
-            '3x1': (3, 1), 
-            '3x5': (3, 5), 
-            '5x3': (5, 3), 
-            '3x7': (3, 7), 
-            '7x3': (7, 3)
-        }
+        
 
         
 
@@ -104,100 +85,17 @@ def train():
             num_fc_layers=config.num_fc_layers,
             conv_dropout=config.conv_dropout,
             linear_dropout=config.linear_dropout,
-            kernel_size=kernel_size_map[config.kernel_size],
+            kernel_size=config.kernel_size,
             activation=activation_fn_map[config.activation_fn],
             hidden_units=config.hidden_units,
             padding = config.padding,
             stride = config.stride,
             pooling_size = config.pooling_size,
-            out_channels = config.out_channels,
-            use_fc_batchnorm = config.use_fc_batchnorm,
-            use_cnn_batchnorm = config.use_cnn_batchnorm 
+            out_channels = config.out_channels 
         ).to(DEVICE)
 
-        # Weight initializations depending on activation function
-        weights_init_map = {
-            'Uniform': lambda m: weights_init_uniform_rule(m),
-            'Xavier_uniform': lambda m: weights_init(m, init_type='Xavier_uniform'),
-            'Xavier_normal': lambda m: weights_init(m, init_type='Xavier_normal'),
-            'Kaiming_uniform': lambda m: weights_init(m, init_type='Kaiming_uniform'),
-            'Kaiming_normal': lambda m: weights_init(m, init_type='Kaiming_normal')
-        }
-        valid_activation_init_combinations = {
-            'ReLU': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal'],
-            'LeakyReLU': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal'],
-            'Tanh': ['Uniform', 'Xavier_uniform', 'Xavier_normal'],
-            'Sigmoid': ['Uniform', 'Xavier_uniform', 'Xavier_normal'],
-            'Swish': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal'],
-            'Mish': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal']
-        }
-        if config.weights_init not in valid_activation_init_combinations[config.activation_fn]:
-            #print(f"Invalid combination: {config.activation_fn} + {config.weights_init}") # debugging
-            return # skips the current run
-
-        model.apply(weights_init_map[config.weights_init])
-
-
-        # Optimizer mapping
-        optimizer_map = {
-            'SGD': torch.optim.SGD,
-            'Adam': torch.optim.Adam,
-            'AdamW': torch.optim.AdamW,
-            'AdaGrad': torch.optim.Adagrad
-        }
-
-        '''
-        # To avoid redundant runs
-        valid_optimizer_weight_decay_combinations = {
-            'SGD': sweep_config['parameters']['weight_decay']['values'],
-            'Adam': [sweep_config['parameters']['weight_decay']['values'][0]],
-            'AdamW': sweep_config['parameters']['weight_decay']['values'],
-            'AdaGrad': [sweep_config['parameters']['weight_decay']['values'][0]]
-        }
-
-        valid_optimizer_momentum_combinations = {
-            'SGD': sweep_config['parameters']['momentum']['values'],
-            'Adam': [sweep_config['parameters']['momentum']['values'][0]],
-            'AdamW': [sweep_config['parameters']['momentum']['values'][0]],
-            'AdaGrad': [sweep_config['parameters']['momentum']['values'][0]]
-        }
-        
-
-        if config.weight_decay not in valid_optimizer_weight_decay_combinations[config.optimizer]:
-            print(f"Invalid combination: {config.optimizer} + {config.weight_decay}")
-            return # skips the current run
-        
-        if config.momentum not in valid_optimizer_momentum_combinations[config.optimizer]:
-            print(f"Invalid combination: {config.optimizer} + {config.weight_decay} + {config.momentum}")
-            return # skips the current run
-        
-        '''
-
-        if config.optimizer == 'SGD':
-            optimizer_params = {
-                'params': model.parameters(),
-                'lr': config.learning_rate,
-                'weight_decay': config.weight_decay,
-                'momentum': config.momentum 
-            }
-        
-        elif config.optimizer == 'AdamW':
-            optimizer_params = {
-                'params': model.parameters(),
-                'lr': config.learning_rate,
-                'weight_decay': config.weight_decay  # Only for AdamW
-            }
-
-        else:  # For Adam and AdaGrad
-            optimizer_params = {
-                'params': model.parameters(),
-                'lr': config.learning_rate          # Basic parameters for Adam and AdaGrad
-            }
-
-
-        # print(f"Optimizer params for {config.optimizer}: {optimizer_params}")
-        optimizer = optimizer_map[config.optimizer](**optimizer_params)
-
+        model.apply(weights_init_uniform_rule)
+        optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=0.9)
         loss_fn = model.loss_fn
 
         # Data Setup
@@ -253,8 +151,8 @@ def train():
                 "loss": avg_loss,
                 "rmse": rmse,
                 #"log_rmse": log_rmse,
-                "val_loss": avg_test_loss,
-                "val_rmse": test_rmse,
+                "test_loss": avg_test_loss,
+                "test_rmse": test_rmse,
                 #"log_test_rmse": log_test_rmse,
             })
 
@@ -269,85 +167,57 @@ def train():
 
 # WandB Sweep Configuration
 sweep_config = {
-    'method': 'bayes',  # Specifies Bayesian optimization
-    'metric': {
-        'name': 'val_rmse',
-        'goal': 'minimize'
-    },
+    'method': 'random',  # Specifies grid search to try all configurations
+    
+    'metric': 
+        {'name': 'test_rmse', 'goal': 'minimize'}
+    ,
+    
     'parameters': {
         'conv_dropout': {
-            'distribution': 'uniform',
-            'min': 0,
-            'max': 0.5  # Adjusted to a continuous range for Bayesian optimization
+            'values': [0, 0.3, 0.5]
         },
         'linear_dropout': {
-            'distribution': 'uniform',
-            'min': 0,
-            'max': 0.5
+            'values': [0, 0.3, 0.5]
         },
         'kernel_size': {
-            'values': ['3x3', '5x5']  # Discrete values remain unchanged
+            'values': [3, 5, 7]
         },
         'hidden_units': {
-            'values': [32, 64, 128]  # Expanded discrete set
+            'values': [64, 128, 256]
         },
         'learning_rate': {
-            'distribution': 'log_uniform',
-            'min': 1e-6,
-            'max': 1e-4  # Continuous log scale for learning rate
+            'values': [1e-4, 1e-5, 1e-6]
         },
         'epochs': {
-            'values': [20]  # Discrete options for epochs
+            'values': [50]
         },
         'batch_size': {
-            'values': [16, 32, 64]  # Discrete options for batch size
-        },
-        'num_conv_layers': {
-            'values': [2, 3, 4]  # Adjusted for possible variations
-        },
-        'num_fc_layers': {
-            'values': [1, 2, 3]
-        },
-        'stride': {
-            'values': [1, 2]  # Discrete set for strides
-        },
-        'padding': {
-            'values': [1, 2]
-        },
-        'pooling_size': {
-            'values': [1, 2, 4]
-        },
-        'out_channels': {
             'values': [16, 32, 64]
         },
+        'num_conv_layers':{
+            'values':[1,2,3]
+        },
+        'num_fc_layers':{
+            'values': [1,2,3]
+        },
+        'stride': {
+            'values': [1,2,3]
+        },
+        'padding': {
+            'values': [1,2,3]
+        },
+        'pooling_size':{
+            'values': [1,2,4]
+        },
+        'out_channels':{
+            'values': [16,32] # at least 2^max_num_conv layers
+        },
         'activation_fn': {
-            'values': ['ReLU', 'LeakyReLU']
-        },
-        'weights_init': {
-            'values': ['Kaiming_uniform', 'Kaiming_normal']
-        },
-        'use_cnn_batchnorm': {
-            'values': [True, False]
-        },
-        'use_fc_batchnorm': {
-            'values': [True, False]
-        },
-        'optimizer': {
-            'values': ['SGD', 'AdamW']
-        },
-        'weight_decay': {
-            'distribution': 'log_uniform',
-            'min': 0,
-            'max': 1e-3  # Log scale for weight decay
-        },
-        'momentum': {
-            'distribution': 'uniform',
-            'min': 0.6,
-            'max': 0.9  # Continuous range for momentum
+            'values': ['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid']
         }
     }
 }
-
 
 if __name__ == "__main__":
     # Initialize the sweep in WandB

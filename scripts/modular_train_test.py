@@ -258,7 +258,7 @@ def train():
 
 # WandB Sweep Configuration
 sweep_config = {
-    'method': 'grid',  # Specifies grid search to try all configurations
+    'method': 'random',  # Specifies grid search to try all configurations
     
     'metric': 
         {'name': 'test_rmse', 'goal': 'minimize'}
@@ -266,10 +266,10 @@ sweep_config = {
     
     'parameters': {
         'conv_dropout': {
-            'values': [0.1, 0.3] #[0.1, 0.3, 0.5]
+            'values': [0, 0.3] #[0.1, 0.3, 0.5]
         },
         'linear_dropout': {
-            'values': [0.1, 0.3] #[0.1, 0.3, 0.5]
+            'values': [0, 0.3] #[0.1, 0.3, 0.5]
         },
         'kernel_size': {
             'values': ['3x3', '5x5']
@@ -278,13 +278,13 @@ sweep_config = {
             'values': [64, 128] #[64, 128, 256]
         },
         'learning_rate': {
-            'values': [ 1e-4, 1e-5]
+            'values': [ 1e-4, 1e-6]
         },
         'epochs': {
-            'values': [250] #[10, 20, 50]
+            'values': [50] #[10, 20, 50]
         },
         'batch_size': {
-            'values': [32, 64] #[16, 32, 64]
+            'values': [16, 32, 64] #[16, 32, 64]
         },
         'num_conv_layers':{
             'values': [2,3]

@@ -1,6 +1,6 @@
 #!/bin/sh
 #BSUB -q gpua100
-#BSUB -J bayes_sweep
+#BSUB -J sweep_basic
 ### number of core
 #BSUB -n 4
 ### specify that all cores should be on the same host

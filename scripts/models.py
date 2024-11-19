@@ -62,6 +62,7 @@ class CNN_97(nn.Module):
             fc_layers.append(activation())
             fc_layers.append(nn.Dropout(linear_dropout))
             input_dim = hidden_units  # Update for the next layer
+            hidden_units = hidden_units // 2
         
         # Final output layer with a single output feature
         fc_layers.append(nn.Linear(input_dim, 1))

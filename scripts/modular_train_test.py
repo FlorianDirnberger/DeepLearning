@@ -184,7 +184,7 @@ sweep_config = {
             'values': [3, 5, 7]
         },
         'hidden_units': {
-            'values': [64, 128, 256]
+            'values': [64, 128, 256] # he used 1028 
         },
         'learning_rate': {
             'values': [1e-4, 1e-5, 1e-6]
@@ -211,7 +211,7 @@ sweep_config = {
             'values': [1,2,4]
         },
         'out_channels':{
-            'values': [16,32] # at least 2^max_num_conv layers
+            'values': [16,32] # at least 2^max_num_conv layers #he used 16 
         },
         'activation_fn': {
             'values': ['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid']

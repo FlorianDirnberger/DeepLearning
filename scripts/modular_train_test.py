@@ -123,6 +123,7 @@ def train():
 
         # Training Loop
         best_vloss = float('inf')
+        exceed_rmse_count = 0  # Counter for consecutive epochs with test_rmse > 8
         for epoch in range(config.epochs):
             print(f'EPOCH {epoch + 1}:')
             model.train(True)
@@ -161,6 +162,15 @@ def train():
                 best_vloss = avg_test_loss
                 model_path = MODEL_DIR / f"model_{model.__class__.__name__}_{wandb.run.name}"
                 torch.save(model.state_dict(), model_path)
+                
+            if test_rmse > 8:
+                exceed_rmse_count += 1
+                if exceed_rmse_count >= 10:
+                    print("Test RMSE exceeded 8 for 10 consecutive epochs. Ending training early.")
+                    break
+            else:
+                exceed_rmse_count = 0  # Reset counter if condition is not met
+
 
     # Ensure that each run is properly finished
     #wandb.finish()
@@ -211,7 +221,7 @@ sweep_config = {
             'values': [1,2,4]
         },
         'out_channels':{
-            'values': [16,32] # at least 2^max_num_conv layers #he used 16 
+            'values': [8, 16] # at least 2^max_num_conv layers #he used 16 
         },
         'activation_fn': {
             'values': ['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid']

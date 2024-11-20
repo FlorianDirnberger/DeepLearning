@@ -266,67 +266,67 @@ sweep_config = {
     
     'parameters': {
         'conv_dropout': {
-            'values': [0.1, 0.3, 0.5] #[0.1, 0.3, 0.5]
+            'values': [0.3] #[0.1, 0.3, 0.5]
         },
         'linear_dropout': {
-            'values': [0.1, 0.3, 0.5] #[0.1, 0.3, 0.5]
+            'values': [0.3] #[0.1, 0.3, 0.5]
         },
         'kernel_size': {
-            'values': ['3x3', '5x5', '7x7', '1x3', '3x1', '3x5', '5x3', '3x7', '7x3']
+            'values': [3x3] #['3x3', '5x5', '7x7', '1x3', '3x1', '3x5', '5x3', '3x7', '7x3']
         },
         'hidden_units': {
-            'values': [64, 128, 256] #[64, 128, 256]
+            'values': [64] #[64, 128, 256]
         },
         'learning_rate': {
-            'values': [1e-3, 1e-4, 1e-5, 1e-6]
+            'values': [1e-6] #[1e-3, 1e-4, 1e-5, 1e-6]
         },
         'epochs': {
-            'values': [10, 20, 50] #[10, 20, 50]
+            'values': [1] #[10, 20, 50]
         },
         'batch_size': {
-            'values': [16, 32, 64] #[16, 32, 64]
+            'values': [16] #[16, 32, 64]
         },
         'num_conv_layers':{
-            'values': [1,2,3]
+            'values': [1] #[1,2,3]
         },
         'num_fc_layers':{
-            'values': [1,2,3] #[1,2,3]
+            'values': [1] #[1,2,3]
         },
         'stride': {
-            'values': [1,2,3] #[1,2,3]
+            'values': [3] #[1,2,3]
         },
         'padding': {
-            'values': [1,2,3] #[1,2,3]
+            'values': [1] #[1,2,3]
         },
         'pooling_size':{
-            'values': [1,2,4] #[1,2,4]
+            'values': [1] #[1,2,4]
         },
         'out_channels':{
-            'values': [16,32] #[16,32] # at least 2^max_num_conv layers
+            'values': [16] #[16,32] # at least 2^max_num_conv layers
         },
         'activation_fn': {
-            'values': ['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid', 'Swish', 'Mish']
+            'values': ['ReLU'] #['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid', 'Swish', 'Mish']
         },
         'weights_init': {
-            'values': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal', 'Xavier_uniform', 'Xavier_normal']
+            'values': ['Uniform'] #['Uniform', 'Kaiming_uniform', 'Kaiming_normal', 'Xavier_uniform', 'Xavier_normal']
         },
 
         # Parameter for batchnorm on cnn_layers
         'use_cnn_batchnorm': {
-            'values': [True, False] #[True, False]
+            'values': [True] #[True, False]
         },
 
         # Parameter for batchnorm on fc_layers
         'use_fc_batchnorm': {
-            'values': [True, False] #[True, False]
+            'values': [True] #[True, False]
         },
 
         # Parameters for optimizer
         'optimizer': {
-            'values': ['SGD', 'Adam', 'AdamW', 'AdaGrad'] #['SGD', 'Adam', 'AdamW', 'AdaGrad']
+            'values': ['SGD'] #['SGD', 'Adam', 'AdamW', 'AdaGrad']
         },
         'weight_decay': {
-            'values': [0, 1e-5, 1e-4, 1e-3, 1e-2] #[0, 1e-5, 1e-4, 1e-3, 1e-2]        
+            'values': [0] #[0, 1e-5, 1e-4, 1e-3, 1e-2]        
         },
         'momentum': {
             'values': [0.7] #[0.7, 0.8, 0.9]        

@@ -139,9 +139,9 @@ def train_one_epoch(loss_fn, model, data_loader, optimizer):
 
 def train():
     with wandb.init(project="DeepLearning-scripts", config={
-        "batch_size": 16,
+        "batch_size": 32,
         "hidden_size": 128,
-        "learning_rate": 0.0001,
+        "learning_rate": 0.001,
         "epochs": 100
     }) as run:
         config = run.config

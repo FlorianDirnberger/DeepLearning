@@ -8,7 +8,6 @@ import os
 import pickle
 import pandas as pd
 import numpy as np
-from torch.nn.utils.rnn import pad_sequence, pack_padded_sequence, pad_packed_sequence
 
 # Constants and Configurations
 GROUP_NUMBER = 97
@@ -18,6 +17,7 @@ ROOT = Path(__file__).parent.parent
 MODEL_DIR = ROOT / "models"
 STM_FILENAME = "stmf_data_3.csv"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+FIXED_LENGTH = 1600  # Fixed length for all sequences
 
 # Load environment variables
 load_dotenv()
@@ -26,8 +26,9 @@ wandb.login(key=wandb_api_key)
 
 
 class TimeSeriesDataset(Dataset):
-    def __init__(self, data_dir, stmf_data_path, transform=None):
+    def __init__(self, data_dir, stmf_data_path, fixed_length=1600, transform=None):
         self.data_dir = data_dir
+        self.fixed_length = fixed_length
         self.transform = transform
 
         # Load ground truth labels
@@ -58,38 +59,36 @@ class TimeSeriesDataset(Dataset):
             with open(data_path, 'rb') as f:
                 timeseries_data = pickle.load(f)
                 if isinstance(timeseries_data, dict) and 'samples' in timeseries_data:
-                    timeseries_data = timeseries_data['samples']
+                    samples = timeseries_data['samples']
                 else:
                     raise ValueError(f"Invalid file format for {data_path}")
 
-                if not isinstance(timeseries_data, np.ndarray):
-                    timeseries_data = np.array(timeseries_data)
+                # Ensure the data is a numpy array
+                if not isinstance(samples, np.ndarray):
+                    samples = np.array(samples)
 
-                if np.iscomplexobj(timeseries_data):
-                    timeseries_data = np.stack([timeseries_data.real, timeseries_data.imag], axis=-1)
+                # Convert complex-valued data to real-imaginary representation
+                if np.iscomplexobj(samples):
+                    samples = np.stack([samples.real, samples.imag], axis=-1)
+
+                # Pad or truncate to fixed length
+                if samples.shape[0] > self.fixed_length:
+                    samples = samples[:self.fixed_length]  # Truncate
+                elif samples.shape[0] < self.fixed_length:
+                    padding = self.fixed_length - samples.shape[0]
+                    samples = np.pad(samples, ((0, padding), (0, 0)), mode='constant')  # Pad
 
         except Exception as e:
             print(f"Error reading file {data_path}: {e}")
             raise
 
         if self.transform:
-            timeseries_data = self.transform(timeseries_data)
+            samples = self.transform(samples)
 
         return {
-            'timeseries': torch.tensor(timeseries_data, dtype=torch.float32),
+            'timeseries': torch.tensor(samples, dtype=torch.float32),
             'label': torch.tensor(label, dtype=torch.float32)
         }
-
-
-def collate_fn(batch):
-    timeseries = [item['timeseries'] for item in batch]
-    labels = torch.tensor([item['label'] for item in batch], dtype=torch.float32)
-    lengths = torch.tensor([len(ts) for ts in timeseries])
-
-    # Pad timeseries to the maximum length in the batch
-    timeseries_padded = pad_sequence(timeseries, batch_first=True)
-
-    return {'timeseries': timeseries_padded, 'lengths': lengths, 'label': labels}
 
 
 class RNN(nn.Module):
@@ -103,11 +102,9 @@ class RNN(nn.Module):
         )
         self.fc = nn.Linear(hidden_size, output_size)
 
-    def forward(self, x, lengths):
-        packed_x = pack_padded_sequence(x, lengths.cpu(), batch_first=True, enforce_sorted=False)
-        packed_out, _ = self.lstm(packed_x)
-        out, _ = pad_packed_sequence(packed_out, batch_first=True)
-        out = out[range(len(out)), lengths - 1, :]  # Get the last time step for each sequence
+    def forward(self, x):
+        out, _ = self.lstm(x)
+        out = out[:, -1, :]  # Get the output from the last time step
         return self.fc(out)
 
 
@@ -116,10 +113,10 @@ def train_one_epoch(loss_fn, model, data_loader, optimizer):
     running_loss = 0.0
 
     for batch in data_loader:
-        timeseries, lengths, labels = batch["timeseries"].to(DEVICE), batch["lengths"], batch["label"].to(DEVICE)
+        timeseries, labels = batch["timeseries"].to(DEVICE), batch["label"].to(DEVICE)
 
         optimizer.zero_grad()
-        outputs = model(timeseries, lengths)
+        outputs = model(timeseries)
         loss = loss_fn(outputs.squeeze(), labels)
         loss.backward()
         optimizer.step()
@@ -141,12 +138,13 @@ def train():
 
         data_dir = DATA_ROOT / DATA_SUBDIR
         stmf_data_path = DATA_ROOT / STM_FILENAME
-        dataset_train = TimeSeriesDataset(data_dir / "train", stmf_data_path)
-        dataset_test = TimeSeriesDataset(data_dir / "test", stmf_data_path)
+        dataset_train = TimeSeriesDataset(data_dir / "train", stmf_data_path, fixed_length=FIXED_LENGTH)
+        dataset_test = TimeSeriesDataset(data_dir / "test", stmf_data_path, fixed_length=FIXED_LENGTH)
 
-        train_loader = DataLoader(dataset_train, batch_size=config.batch_size, collate_fn=collate_fn, shuffle=True)
-        test_loader = DataLoader(dataset_test, batch_size=config.batch_size, collate_fn=collate_fn, shuffle=False)
+        train_loader = DataLoader(dataset_train, batch_size=config.batch_size, shuffle=True)
+        test_loader = DataLoader(dataset_test, batch_size=config.batch_size, shuffle=False)
 
+        # Determine input size
         sample = next(iter(train_loader))
         input_size = sample['timeseries'].shape[-1]
 
@@ -186,7 +184,7 @@ if __name__ == "__main__":
     if test_dataset:
         data_dir = DATA_ROOT / DATA_SUBDIR / "train"
         stmf_data_path = DATA_ROOT / STM_FILENAME
-        dataset = TimeSeriesDataset(data_dir, stmf_data_path)
+        dataset = TimeSeriesDataset(data_dir, stmf_data_path, fixed_length=FIXED_LENGTH)
 
         print(f"Number of valid samples: {len(dataset)}")
         for i in range(min(5, len(dataset))):

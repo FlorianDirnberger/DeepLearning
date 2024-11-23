@@ -4,15 +4,22 @@ import torch
 from loss import mse_loss
 from datasets import SpectrogramDataset
 class RNN(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        super(BasicRNN, self).__init__()
+    def __init__(self, input_size, hidden_size, output_size, num_layers=1):
+        super(RNN, self).__init__()
         self.hidden_size = hidden_size
-        self.rnn = nn.RNN(input_size, hidden_size, batch_first=True)
+        self.rnn = nn.RNN(
+            input_size=input_size, 
+            hidden_size=hidden_size, 
+            num_layers=num_layers, 
+            batch_first=True
+        )
         self.fc = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
         # RNN forward pass
         out, hidden = self.rnn(x)
+        # Take the output from the last time step
+        out = out[:, -1, :]  # Assuming you want to use the last output
         # Apply the fully connected layer to the RNN output
         out = self.fc(out)
         return out

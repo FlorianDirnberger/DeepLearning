@@ -1,31 +1,23 @@
 from pathlib import Path
-from numpy import log10
 import torch
-from torchvision.transforms import transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 import wandb
 import torch.nn as nn
 from dotenv import load_dotenv
 import os
-
-from custom_transforms import LoadSpectrogram, NormalizeSpectrogram, ToTensor, InterpolateSpectrogram
-from data_management import make_dataset_name
-#from models import SpectrVelCNNRegr, CNN_97, weights_init_uniform_rule
-from models import  CNN_97, weights_init_uniform_rule, RNN
+import pickle
+import pandas as pd
 
 # GROUP NUMBER
 GROUP_NUMBER = 97
 
-# CONSTANTS TO LEAVE
-DATA_ROOT = Path(f"/dtu-compute/02456-p4-e24/data") 
+# Adjusted Constants
+DATA_ROOT = Path("/dtu-compute/02456-p4-e24/data")
+DATA_SUBDIR = "data_fft-512_tscropwidth-150-200_vrcropwidth-60-15"
 ROOT = Path(__file__).parent.parent
 MODEL_DIR = ROOT / "models"
-STMF_FILENAME = "stmf_data_3.csv"
-NFFT = 512
-TS_CROPTWIDTH = (-150, 200)
-VR_CROPTWIDTH = (-60, 15)
-DEVICE = "cpu"
-
+STM_FILENAME = "stmf_data_3.csv"
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"  # Use GPU if available
 
 # Load environment variables from .env file
 load_dotenv()
@@ -33,76 +25,73 @@ load_dotenv()
 wandb_api_key = os.getenv("WANDB_API_KEY")
 wandb.login(key=wandb_api_key)
 
+
 class TimeSeriesDataset(Dataset):
-    # replace ID anmd label 
     def __init__(self, data_dir, stmf_data_path, transform=None):
         self.data_dir = data_dir
         self.transform = transform
-        
+
         # Load the ground truth labels
         self.stmf_df = pd.read_csv(stmf_data_path)
-        
-        # Assuming the CSV has 'ID' and 'Label' columns
-        # Modify 'ID' and 'Label' based on your actual CSV column names
-        self.sample_ids = self._get_sample_ids()
-        
-    def _get_sample_ids(self):
-        # List all .pkl files in the data_dir and extract IDs
-        pkl_files = [f for f in os.listdir(self.data_dir) if f.endswith('_timeseries.pkl')]
-        sample_ids = [int(f.split('_')[0]) for f in pkl_files]
-        return sample_ids
-        
+
+        # Extract IDs and labels
+        self.sample_ids = self.stmf_df.iloc[:, 0].tolist()
+        self.labels = self.stmf_df['BallVr'].tolist()
+
+        # Exclude missing files
+        valid_ids = []
+        valid_labels = []
+        for sample_id, label in zip(self.sample_ids, self.labels):
+            data_path = self.data_dir / f"{sample_id}_timeseries.pkl"
+            if data_path.exists():
+                valid_ids.append(sample_id)
+                valid_labels.append(label)
+        self.sample_ids = valid_ids
+        self.labels = valid_labels
+
     def __len__(self):
         return len(self.sample_ids)
-    
+
     def __getitem__(self, idx):
         sample_id = self.sample_ids[idx]
-        # Build the filename for the pkl file
+        label = self.labels[idx]
+
+        # Build the filename for the .pkl file
         data_path = self.data_dir / f"{sample_id}_timeseries.pkl"
-        
-        # Load the time series data from the pkl file
+
+        # Load the time series data from the .pkl file
         with open(data_path, 'rb') as f:
             timeseries_data = pickle.load(f)
-        
-        # Get the label from the stmf_df
-        # Modify 'ID' and 'Label' to match your CSV column names
-        label_row = self.stmf_df[self.stmf_df['ID'] == sample_id]
-        if label_row.empty:
-            raise ValueError(f"Sample ID {sample_id} not found in STMF data.")
-        label = label_row['Label'].values[0]
-        
+
         # Apply any transforms if specified
         if self.transform:
             timeseries_data = self.transform(timeseries_data)
-        
+
         # Convert timeseries_data and label to tensors
         timeseries_data = torch.tensor(timeseries_data, dtype=torch.float32)
-        
+
         # Ensure timeseries_data has shape (seq_len, input_size)
         if timeseries_data.dim() == 1:
             timeseries_data = timeseries_data.unsqueeze(-1)  # Add input_size dimension
-        
+
         label = torch.tensor(label, dtype=torch.float32)
         return {'timeseries': timeseries_data, 'label': label}
-    
-    
+
 
 
 def train_one_epoch(loss_fn, model, train_data_loader, optimizer):
-    running_loss = 0.
-    total_loss = 0.
+    running_loss = 0.0
+    total_loss = 0.0
 
     for i, data in enumerate(train_data_loader):
-        spectrogram, target = data["spectrogram"].to(DEVICE), data["target"].to(DEVICE)
-        
-        #print(f"Batch {i} - Spectrogram shape: {spectrogram.shape}, Target shape: {target.shape}")
-        
+        timeseries, label = data["timeseries"].to(DEVICE), data["label"].to(DEVICE)
+
         optimizer.zero_grad()
 
-        outputs = model(spectrogram)
+        outputs = model(timeseries)
 
         # Compute the loss and its gradients
-        loss = loss_fn(outputs.squeeze(), target)
+        loss = loss_fn(outputs.squeeze(), label)
         loss.backward()
 
         # Adjust learning weights
@@ -111,58 +100,67 @@ def train_one_epoch(loss_fn, model, train_data_loader, optimizer):
         # Gather data and report
         running_loss += loss.item()
         total_loss += loss.item()
-        if i % train_data_loader.batch_size == train_data_loader.batch_size - 1:
+        if (i + 1) % train_data_loader.batch_size == 0:
             last_loss = running_loss / train_data_loader.batch_size
             print(f'  batch {i + 1} loss: {last_loss}')
-            running_loss = 0.
+            running_loss = 0.0
 
-    return total_loss / (i+1)
+    return total_loss / (i + 1)
+
 
 def train():
     with wandb.init() as run:
         config = run.config
-        #activation_fn = nn.ReLU
-        activation_fn_map = {
-            'ReLU': nn.ReLU,
-            'LeakyReLU': nn.LeakyReLU,
-            'Tanh': nn.Tanh,
-            'Sigmoid': nn.Sigmoid
-        }
-        
-
-        
-
-        # Initialize model with the current WandB configuration
-        model = RNN(input_size = 1,
-                    hidden_size = 1, 
-                    output_size = 1).to(DEVICE)
-
-        model.apply(weights_init_uniform_rule)
-        optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=0.9)
-        loss_fn = model.loss_fn
 
         # Data Setup
-        dataset_name = make_dataset_name(nfft=NFFT, ts_crop_width=TS_CROPTWIDTH, vr_crop_width=VR_CROPTWIDTH)
-        data_dir = DATA_ROOT / dataset_name
+        data_dir = DATA_ROOT / DATA_SUBDIR
+        stmf_data_path = DATA_ROOT / STM_FILENAME
 
-        TRAIN_TRANSFORM = transforms.Compose([
-            LoadSpectrogram(root_dir=data_dir / "train"),
-            NormalizeSpectrogram(),
-            ToTensor(),
-            InterpolateSpectrogram()
-        ])
-        TEST_TRANSFORM = transforms.Compose([
-            LoadSpectrogram(root_dir=data_dir / "test"),
-            NormalizeSpectrogram(),
-            ToTensor(),
-            InterpolateSpectrogram()
-        ])
+        print(f"Data root directory: {DATA_ROOT}")
+        print(f"Data subdirectory: {data_dir}")
+        print(f"Train data directory: {data_dir / 'train'}")
+        print(f"Test data directory: {data_dir / 'test'}")
+        print(f"STM filename path: {stmf_data_path}")
 
-        dataset_train = model.dataset(data_dir=data_dir / "train", stmf_data_path=DATA_ROOT / STMF_FILENAME, transform=TRAIN_TRANSFORM)
-        dataset_test = model.dataset(data_dir=data_dir / "test", stmf_data_path=DATA_ROOT / STMF_FILENAME, transform=TEST_TRANSFORM)
-        
-        train_data_loader = DataLoader(dataset_train, batch_size=config.batch_size, shuffle=True, num_workers=4)
-        test_data_loader = DataLoader(dataset_test, batch_size=500, shuffle=False, num_workers=1)
+        dataset_train = TimeSeriesDataset(
+            data_dir=data_dir / "train",
+            stmf_data_path=stmf_data_path
+        )
+        dataset_test = TimeSeriesDataset(
+            data_dir=data_dir / "test",
+            stmf_data_path=stmf_data_path
+        )
+
+        train_data_loader = DataLoader(
+            dataset_train,
+            batch_size=config.batch_size,
+            shuffle=True,
+            num_workers=4
+        )
+        test_data_loader = DataLoader(
+            dataset_test,
+            batch_size=config.batch_size,
+            shuffle=False,
+            num_workers=1
+        )
+
+        # Determine input_size based on your data
+        sample = next(iter(train_data_loader))
+        timeseries_sample = sample['timeseries']
+        input_size = timeseries_sample.shape[2]  # timeseries_sample shape: (batch_size, seq_len, input_size)
+
+        # Initialize model with the current WandB configuration
+        model = RNN(
+            input_size=input_size,
+            hidden_size=config.hidden_size,
+            output_size=1,
+            num_layers=config.num_layers
+        ).to(DEVICE)
+
+        # Initialize weights if necessary
+        model.apply(weights_init_uniform_rule)
+        optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=0.9)
+        loss_fn = nn.MSELoss()
 
         # Training Loop
         best_vloss = float('inf')
@@ -171,103 +169,101 @@ def train():
             print(f'EPOCH {epoch + 1}:')
             model.train(True)
             avg_loss = train_one_epoch(loss_fn, model, train_data_loader, optimizer)
-            
-            rmse = avg_loss ** 0.5
-            #log_rmse = log10(rmse)
 
-            running_test_loss = 0.
+            rmse = avg_loss ** 0.5
+
+            running_test_loss = 0.0
             model.eval()
             with torch.no_grad():
                 for i, vdata in enumerate(test_data_loader):
-                    spectrogram, target = vdata["spectrogram"].to(DEVICE), vdata["target"].to(DEVICE)
-                    test_outputs = model(spectrogram)
-                    test_loss = loss_fn(test_outputs.squeeze(), target)
+                    timeseries, label = vdata["timeseries"].to(DEVICE), vdata["label"].to(DEVICE)
+                    test_outputs = model(timeseries)
+                    test_loss = loss_fn(test_outputs.squeeze(), label)
                     running_test_loss += test_loss.item()
 
             avg_test_loss = running_test_loss / (i + 1)
             test_rmse = avg_test_loss ** 0.5
-            #log_test_rmse = torch.log10(test_rmse)
 
             print(f'LOSS train {avg_loss} ; LOSS test {avg_test_loss}')
-            
-            # log metrics to wandb
+
+            # Log metrics to wandb
             wandb.log({
+                "epoch": epoch + 1,
                 "loss": avg_loss,
                 "rmse": rmse,
-                #"log_rmse": log_rmse,
                 "test_loss": avg_test_loss,
                 "test_rmse": test_rmse,
-                #"log_test_rmse": log_test_rmse,
             })
 
             # Track best performance, and save the model's state
             if avg_test_loss < best_vloss:
                 best_vloss = avg_test_loss
-                model_path = MODEL_DIR / f"model_{model.__class__.__name__}_{wandb.run.name}"
+                model_path = MODEL_DIR / f"model_{model.__class__.__name__}_{wandb.run.name}.pt"
                 torch.save(model.state_dict(), model_path)
-                
+
             if test_rmse > 8:
                 exceed_rmse_count += 1
-                if exceed_rmse_count >= 8:
+                if exceed_rmse_count >= 10:
                     print("Test RMSE exceeded 8 for 10 consecutive epochs. Ending training early.")
                     break
             else:
                 exceed_rmse_count = 0  # Reset counter if condition is not met
 
 
-    # Ensure that each run is properly finished
-    #wandb.finish()
+# Define the RNN model
+class RNN(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size, num_layers=1):
+        super(RNN, self).__init__()
+        self.hidden_size = hidden_size
+        self.lstm = nn.LSTM(
+            input_size=input_size,
+            hidden_size=hidden_size,
+            num_layers=num_layers,
+            batch_first=True
+        )
+        self.fc = nn.Linear(hidden_size, output_size)
+
+    def forward(self, x):
+        # x shape: (batch_size, seq_len, input_size)
+        out, _ = self.lstm(x)
+        out = out[:, -1, :]  # Get the output from the last time step
+        out = self.fc(out)
+        return out
+
+
+def weights_init_uniform_rule(m):
+    classname = m.__class__.__name__
+    # For LSTM and Linear layers
+    if classname.find('Linear') != -1 or classname.find('LSTM') != -1:
+        # Initialize weights with uniform distribution
+        if hasattr(m, 'weight') and m.weight is not None:
+            nn.init.uniform_(m.weight.data, -0.1, 0.1)
+        if hasattr(m, 'bias') and m.bias is not None:
+            nn.init.constant_(m.bias.data, 0)
+
 
 # WandB Sweep Configuration
 sweep_config = {
-    'method': 'random',  # Specifies grid search to try all configurations
-    
-    'metric': 
-        {'name': 'test_rmse', 'goal': 'minimize'}
-    ,
-    
+    'method': 'random',  # Specifies random search
+
+    'metric':
+        {'name': 'test_rmse', 'goal': 'minimize'},
+
     'parameters': {
-        'conv_dropout': {
-            'values': [0, 0.3, 0.5]
+        'hidden_size': {
+            'values': [64, 128, 256]
         },
-        'linear_dropout': {
-            'values': [0, 0.3, 0.5]
-        },
-        'kernel_size': {
-            'values': [3, 5, 7]
-        },
-        'hidden_units': {
-            'values': [64, 128, 256] # he used 1028 
+        'num_layers': {
+            'values': [1, 2, 3]
         },
         'learning_rate': {
-            'values': [1e-4, 1e-5, 1e-6]
+            'values': [1e-3, 1e-4, 1e-5]
         },
         'epochs': {
             'values': [20]
         },
         'batch_size': {
             'values': [16, 32, 64]
-        },
-        'num_conv_layers':{
-            'values':[1,2,3]
-        },
-        'num_fc_layers':{
-            'values': [1,2,3]
-        },
-        'stride': {
-            'values': [1,2,3]
-        },
-        'padding': {
-            'values': [1,2,3]
-        },
-        'pooling_size':{
-            'values': [1,2,4]
-        },
-        'out_channels':{
-            'values': [8, 16] # at least 2^max_num_conv layers #he used 16 
-        },
-        'activation_fn': {
-            'values': ['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid']
         }
     }
 }
@@ -275,4 +271,4 @@ sweep_config = {
 if __name__ == "__main__":
     # Initialize the sweep in WandB
     sweep_id = wandb.sweep(sweep_config, project="Deep Learning Project Group 97")
-    wandb.agent(sweep_id, train)
+    wandb.agent(sweep_id, function=train)

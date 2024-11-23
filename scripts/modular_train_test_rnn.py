@@ -29,10 +29,63 @@ DEVICE = "cpu"
 
 # Load environment variables from .env file
 load_dotenv()
-
 # Use the API key from the environment variable
 wandb_api_key = os.getenv("WANDB_API_KEY")
 wandb.login(key=wandb_api_key)
+
+class TimeSeriesDataset(Dataset):
+    # replace ID anmd label 
+    def __init__(self, data_dir, stmf_data_path, transform=None):
+        self.data_dir = data_dir
+        self.transform = transform
+        
+        # Load the ground truth labels
+        self.stmf_df = pd.read_csv(stmf_data_path)
+        
+        # Assuming the CSV has 'ID' and 'Label' columns
+        # Modify 'ID' and 'Label' based on your actual CSV column names
+        self.sample_ids = self._get_sample_ids()
+        
+    def _get_sample_ids(self):
+        # List all .pkl files in the data_dir and extract IDs
+        pkl_files = [f for f in os.listdir(self.data_dir) if f.endswith('_timeseries.pkl')]
+        sample_ids = [int(f.split('_')[0]) for f in pkl_files]
+        return sample_ids
+        
+    def __len__(self):
+        return len(self.sample_ids)
+    
+    def __getitem__(self, idx):
+        sample_id = self.sample_ids[idx]
+        # Build the filename for the pkl file
+        data_path = self.data_dir / f"{sample_id}_timeseries.pkl"
+        
+        # Load the time series data from the pkl file
+        with open(data_path, 'rb') as f:
+            timeseries_data = pickle.load(f)
+        
+        # Get the label from the stmf_df
+        # Modify 'ID' and 'Label' to match your CSV column names
+        label_row = self.stmf_df[self.stmf_df['ID'] == sample_id]
+        if label_row.empty:
+            raise ValueError(f"Sample ID {sample_id} not found in STMF data.")
+        label = label_row['Label'].values[0]
+        
+        # Apply any transforms if specified
+        if self.transform:
+            timeseries_data = self.transform(timeseries_data)
+        
+        # Convert timeseries_data and label to tensors
+        timeseries_data = torch.tensor(timeseries_data, dtype=torch.float32)
+        
+        # Ensure timeseries_data has shape (seq_len, input_size)
+        if timeseries_data.dim() == 1:
+            timeseries_data = timeseries_data.unsqueeze(-1)  # Add input_size dimension
+        
+        label = torch.tensor(label, dtype=torch.float32)
+        return {'timeseries': timeseries_data, 'label': label}
+    
+    
 
 
 def train_one_epoch(loss_fn, model, train_data_loader, optimizer):

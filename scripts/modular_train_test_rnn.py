@@ -8,6 +8,7 @@ import os
 import pickle
 import pandas as pd
 import numpy as np
+from models import RNN, weights_init_uniform_rule
 
 # Constants and Configurations
 GROUP_NUMBER = 97
@@ -58,10 +59,12 @@ class TimeSeriesDataset(Dataset):
         try:
             with open(data_path, 'rb') as f:
                 timeseries_data = pickle.load(f)
+                
+                # Ensure the file contains a dictionary with 'samples'
                 if isinstance(timeseries_data, dict) and 'samples' in timeseries_data:
                     samples = timeseries_data['samples']
                 else:
-                    raise ValueError(f"Invalid file format for {data_path}")
+                    raise ValueError(f"Invalid file format or missing 'samples' key in {data_path}")
 
                 # Ensure the data is a numpy array
                 if not isinstance(samples, np.ndarray):
@@ -69,43 +72,51 @@ class TimeSeriesDataset(Dataset):
 
                 # Convert complex-valued data to real-imaginary representation
                 if np.iscomplexobj(samples):
-                    samples = np.stack([samples.real, samples.imag], axis=-1)
+                    samples = np.stack([samples.real, samples.imag], axis=-1)  # Adds last dimension for (real, imag)
 
-                # Pad or truncate to fixed length
-                if samples.shape[0] > self.fixed_length:
-                    samples = samples[:self.fixed_length]  # Truncate
-                elif samples.shape[0] < self.fixed_length:
-                    padding = self.fixed_length - samples.shape[0]
-                    samples = np.pad(samples, ((0, padding), (0, 0)), mode='constant')  # Pad
+                # Ensure the data is at least 2D for padding or truncation
+                if samples.ndim == 1:
+                    samples = samples[:, np.newaxis]  # Convert 1D to 2D
+
+                # Handle the first dimension independently
+                target_dim1 = 1600  # Target length for the first dimension
+                if samples.shape[0] > target_dim1:
+                    samples = samples[:target_dim1, ...]  # Truncate along the first axis
+                elif samples.shape[0] < target_dim1:
+                    padding_dim1 = target_dim1 - samples.shape[0]
+                    samples = np.pad(samples, [(0, padding_dim1)] + [(0, 0)] * (samples.ndim - 1), mode='constant')
+
+                # Handle the second dimension independently
+                target_dim2 = 1600  # Target length for the second dimension
+                if samples.shape[1] > target_dim2:
+                    samples = samples[:, :target_dim2, ...]  # Truncate along the second axis
+                elif samples.shape[1] < target_dim2:
+                    padding_dim2 = target_dim2 - samples.shape[1]
+                    samples = np.pad(samples, [(0, 0), (0, padding_dim2)] + [(0, 0)] * (samples.ndim - 2), mode='constant')
 
         except Exception as e:
             print(f"Error reading file {data_path}: {e}")
             raise
 
+        # Apply optional transformations if defined
         if self.transform:
             samples = self.transform(samples)
 
-        return {
+        # Create the return dictionary
+        data = {
             'timeseries': torch.tensor(samples, dtype=torch.float32),
             'label': torch.tensor(label, dtype=torch.float32)
         }
 
+        # Debugging output
+        #print(f"Index: {idx}, Sample ID: {sample_id}")
+        #print(f"Timeseries Shape: {data['timeseries'].shape}")
+        #print(f"Label: {data['label']}")
+        
+        return data
+        
+        
 
-class RNN(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size, num_layers=1):
-        super(RNN, self).__init__()
-        self.lstm = nn.LSTM(
-            input_size=input_size,
-            hidden_size=hidden_size,
-            num_layers=num_layers,
-            batch_first=True
-        )
-        self.fc = nn.Linear(hidden_size, output_size)
-
-    def forward(self, x):
-        out, _ = self.lstm(x)
-        out = out[:, -1, :]  # Get the output from the last time step
-        return self.fc(out)
 
 
 def train_one_epoch(loss_fn, model, data_loader, optimizer):
@@ -130,9 +141,8 @@ def train():
     with wandb.init(project="DeepLearning-scripts", config={
         "batch_size": 16,
         "hidden_size": 128,
-        "num_layers": 2,
-        "learning_rate": 0.01,
-        "epochs": 10
+        "learning_rate": 0.0001,
+        "epochs": 100
     }) as run:
         config = run.config
 
@@ -146,13 +156,13 @@ def train():
 
         # Determine input size
         sample = next(iter(train_loader))
-        input_size = sample['timeseries'].shape[-1]
+        timeseries_shape = sample['timeseries'].shape  # [batch_size, seq_len, feature_dim1, feature_dim2]
+        input_size = timeseries_shape[-2] * timeseries_shape[-1]  # feature_dim1 * feature_dim2
 
         model = RNN(
             input_size=input_size,
             hidden_size=config.hidden_size,
             output_size=1,
-            num_layers=config.num_layers
         ).to(DEVICE)
         model.apply(weights_init_uniform_rule)
 
@@ -172,11 +182,20 @@ def train():
 
 
 def weights_init_uniform_rule(m):
-    if isinstance(m, (nn.Linear, nn.LSTM)):
-        nn.init.uniform_(m.weight.data, -0.1, 0.1)
+    if isinstance(m, nn.Linear):  # Handle Linear layers
+        nn.init.uniform_(m.weight, -0.1, 0.1)
         if m.bias is not None:
-            nn.init.constant_(m.bias.data, 0)
-
+            nn.init.uniform_(m.bias, -0.1, 0.1)
+    elif isinstance(m, nn.Conv2d):  # Handle Conv2D layers
+        nn.init.uniform_(m.weight, -0.1, 0.1)
+        if m.bias is not None:
+            nn.init.uniform_(m.bias, -0.1, 0.1)
+    elif isinstance(m, nn.LSTM):  # Handle LSTM layers
+        for name, param in m.named_parameters():
+            if "weight" in name:  # Initialize weights
+                nn.init.uniform_(param, -0.1, 0.1)
+            elif "bias" in name:  # Initialize biases
+                nn.init.uniform_(param, -0.1, 0.1)
 
 if __name__ == "__main__":
     test_dataset = False

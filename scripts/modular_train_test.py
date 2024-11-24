@@ -89,11 +89,17 @@ def train():
             '5x5': (5, 5),
             '7x7': (7, 7), 
             '1x3': (1, 3), 
-            '3x1': (3, 1), 
+            '3x1': (3, 1),
+            '1x5': (1, 5), 
+            '5x1': (5, 1),
+            '1x7': (1, 7), 
+            '7x1': (7, 1), 
             '3x5': (3, 5), 
             '5x3': (5, 3), 
             '3x7': (3, 7), 
-            '7x3': (7, 3)
+            '7x3': (7, 3),
+            '5x7': (3, 7), 
+            '7x5': (7, 3)
         }
 
         
@@ -114,6 +120,12 @@ def train():
             use_fc_batchnorm = config.use_fc_batchnorm,
             use_cnn_batchnorm = config.use_cnn_batchnorm 
         ).to(DEVICE)
+
+        # Total model parameter, tracked in wandb
+        total_params = sum(param.numel() for param in model.parameters())
+        print(f"Total parameters: {total_params}")
+        wandb.log({"total_parameters": total_params})
+
 
         # Weight initializations depending on activation function
         weights_init_map = {
@@ -162,11 +174,11 @@ def train():
         }
 
         if config.weight_decay not in valid_optimizer_weight_decay_combinations[config.optimizer]:
-            print(f"Invalid combination: {config.optimizer} + {config.weight_decay}")
+            #print(f"Invalid combination: {config.optimizer} + {config.weight_decay}")
             return # skips the current run
         
         if config.momentum not in valid_optimizer_momentum_combinations[config.optimizer]:
-            print(f"Invalid combination: {config.optimizer} + {config.weight_decay} + {config.momentum}")
+            #print(f"Invalid combination: {config.optimizer} + {config.weight_decay} + {config.momentum}")
             return # skips the current run
 
         if config.optimizer == 'SGD':
@@ -266,7 +278,7 @@ def train():
                 
             if validation_rmse > 8:
                 exceed_rmse_count += 1
-                if exceed_rmse_count >= 10:
+                if exceed_rmse_count >= 50:
                     print("Test RMSE exceeded 8 for 10 consecutive epochs. Ending training early.")
                     break
             else:
@@ -279,73 +291,76 @@ def train():
 sweep_config = {
     'method': 'grid',  # Specifies grid search to try all configurations
     
-    'metric': 
-        {'name': 'validation_rmse', 'goal': 'minimize'}
-    ,
+    'metric': {
+        'name': 'validation_rmse', 
+        'goal': 'minimize'
+    },
+
+    #'count': 800, # for random method only
     
     'parameters': {
         'conv_dropout': {
-            'values': [0, 0.3] #[0.1, 0.3, 0.5]
+            'values': [0] #[0, 0.1, 0.2, 0.3, 0.4, 0.5] #[0.1, 0.3, 0.5]
         },
         'linear_dropout': {
-            'values': [0] #[0.1, 0.3, 0.5]
+            'values': [0] #[0, 0.1, 0.2, 0.3, 0.4, 0.5] #[0.1, 0.3, 0.5]
         },
         'kernel_size': {
-            'values': ['3x3']
+            'values': ['3x3', '5x5', '7x7'] #['3x3', '5x5', '7x7', '1x3', '3x1', '1x5', '5x1', '1x7', '7x1', '3x5', '5x3', '3x7', '7x3', '5x7', '7x5']
         },
         'hidden_units': {
-            'values': [32, 128] #[64, 128, 256]
+            'values': [64] #[32, 64, 128] #[64, 128, 256]
         },
         'learning_rate': {
-            'values': [1e-4, 1e-5]
+            'values': [1e-4] #[1e-4, 1e-5, 1e-6]
         },
         'epochs': {
-            'values': [50] #[10, 20, 50]
+            'values': [30] #[10, 20, 50]
         },
         'batch_size': {
-            'values': [32, 64] #[16, 32, 64]
+            'values': [32] #[16, 32, 64] #[16, 32, 64]
         },
         'num_conv_layers':{
-            'values': [2,3]
+            'values': [1, 2, 3, 4, 5] #[1, 2, 3]
         },
         'num_fc_layers':{
-            'values': [2] #[1,2,3]
+            'values': [3] #[1, 2, 3] #[1,2,3]
         },
         'stride': {
-            'values': [1] #[1,2,3]
+            'values': [1, 2] #[1, 2, 3] #[1,2,3]
         },
         'padding': {
-            'values': [1] #[1,2,3]
+            'values': [0, 1] #[0, 1, 2, 3] #[1,2,3]
         },
         'pooling_size':{
-            'values': [2] #[1,2,4]
+            'values': [1, 2] #[1, 2, 4] #[1,2,4]
         },
         'out_channels':{
-            'values': [8,16] #[16,32] # at least 2^max_num_conv layers
+            'values': [8, 16, 32, 64] #[8, 16] #[16,32] # at least 2^max_num_conv layers
         },
         'activation_fn': {
-            'values': ['ReLU']
+            'values': ['ReLU'] #['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid', 'Swish', 'Mish']
         },
         'weights_init': {
-            'values': ['Kaiming_normal']
+            'values': ['Uniform'] #['Uniform', 'Kaiming_uniform', 'Kaiming_normal', 'Xavier_uniform', 'Xavier_normal']
         },
 
         # Parameter for batchnorm on cnn_layers
         'use_cnn_batchnorm': {
-            'values': [True] #[True, False]
+            'values': [True] #[True, False] #[True, False]
         },
 
         # Parameter for batchnorm on fc_layers
         'use_fc_batchnorm': {
-            'values': [True] #[True, False]
+            'values': [True] #[True, False] #[True, False]
         },
 
         # Parameters for optimizer
         'optimizer': {
-            'values': ['SGD', 'AdamW'] #['SGD', 'Adam', 'AdamW', 'AdaGrad']
+            'values': ['SGD'] #['SGD', 'Adam', 'AdamW', 'AdaGrad']
         },
         'weight_decay': {
-            'values': [0, 1e-5] #[0, 1e-5, 1e-4, 1e-3, 1e-2]        
+            'values': [1e-5] #[0, 1e-5, 1e-4, 1e-3, 1e-2]        
         },
         'momentum': {
             'values': [0.9] #[0.7, 0.8, 0.9]        

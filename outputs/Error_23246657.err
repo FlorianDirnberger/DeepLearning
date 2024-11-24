@@ -1,0 +1,1005 @@
+Loaded module: cuda/11.8
+Loaded dependency [python3/3.10.13]: sqlite3/3.45.1
+Loaded dependency [python3/3.10.13]: gcc/12.3.0-binutils-2.40
+Loaded module: python3/3.10.13
+
+Loading python3/3.10.13
+  Loading requirement: sqlite3/3.45.1 gcc/12.3.0-binutils-2.40
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: raimo-sieber (raimo-sieber-technical-university-of-munich). Use `wandb login --relogin` to force relogin
+wandb: Agent Starting Run: ogrm24le with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 8
+wandb: 	padding: 0
+wandb: 	pooling_size: 1
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_004611-ogrm24le
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run pretty-sweep-1
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/ogrm24le
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 33770249
+wandb:       train_loss 1.55577
+wandb:       train_rmse 1.2473
+wandb:  validation_loss 4.29385
+wandb:  validation_rmse 2.07216
+wandb: 
+wandb: 🚀 View run pretty-sweep-1 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/ogrm24le
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_004611-ogrm24le/logs
+wandb: Sweep Agent: Waiting for job.
+wandb: Job received.
+wandb: Agent Starting Run: a4ifeda6 with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 8
+wandb: 	padding: 0
+wandb: 	pooling_size: 1
+wandb: 	stride: 2
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_005224-a4ifeda6
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run sandy-sweep-2
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/a4ifeda6
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▄▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 8444681
+wandb:       train_loss 2.01193
+wandb:       train_rmse 1.41843
+wandb:  validation_loss 5.73267
+wandb:  validation_rmse 2.3943
+wandb: 
+wandb: 🚀 View run sandy-sweep-2 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/a4ifeda6
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_005224-a4ifeda6/logs
+wandb: Agent Starting Run: 56ii8i8n with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 8
+wandb: 	padding: 0
+wandb: 	pooling_size: 2
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_005642-56ii8i8n
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run graceful-sweep-3
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/56ii8i8n
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 8444681
+wandb:       train_loss 2.11515
+wandb:       train_rmse 1.45435
+wandb:  validation_loss 5.77513
+wandb:  validation_rmse 2.40315
+wandb: 
+wandb: 🚀 View run graceful-sweep-3 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/56ii8i8n
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_005642-56ii8i8n/logs
+wandb: Agent Starting Run: 4jjc3zgb with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 8
+wandb: 	padding: 0
+wandb: 	pooling_size: 2
+wandb: 	stride: 2
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_010106-4jjc3zgb
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run rose-sweep-4
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/4jjc3zgb
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 2113289
+wandb:       train_loss 1.7643
+wandb:       train_rmse 1.32827
+wandb:  validation_loss 4.84395
+wandb:  validation_rmse 2.2009
+wandb: 
+wandb: 🚀 View run rose-sweep-4 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/4jjc3zgb
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_010106-4jjc3zgb/logs
+wandb: Sweep Agent: Waiting for job.
+wandb: Job received.
+wandb: Agent Starting Run: j16asoz1 with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 8
+wandb: 	padding: 1
+wandb: 	pooling_size: 1
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_010535-j16asoz1
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run ethereal-sweep-5
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/j16asoz1
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 34784009
+wandb:       train_loss 1.90551
+wandb:       train_rmse 1.3804
+wandb:  validation_loss 4.44962
+wandb:  validation_rmse 2.10941
+wandb: 
+wandb: 🚀 View run ethereal-sweep-5 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/j16asoz1
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_010535-j16asoz1/logs
+wandb: Agent Starting Run: 1kdhwtmt with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 8
+wandb: 	padding: 1
+wandb: 	pooling_size: 1
+wandb: 	stride: 2
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_011006-1kdhwtmt
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run faithful-sweep-6
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/1kdhwtmt
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 8698121
+wandb:       train_loss 2.02093
+wandb:       train_rmse 1.42159
+wandb:  validation_loss 5.52612
+wandb:  validation_rmse 2.35077
+wandb: 
+wandb: 🚀 View run faithful-sweep-6 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/1kdhwtmt
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_011006-1kdhwtmt/logs
+wandb: Agent Starting Run: uklkpetg with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 8
+wandb: 	padding: 1
+wandb: 	pooling_size: 2
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_011435-uklkpetg
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run fiery-sweep-7
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/uklkpetg
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 8698121
+wandb:       train_loss 2.06777
+wandb:       train_rmse 1.43797
+wandb:  validation_loss 4.44223
+wandb:  validation_rmse 2.10766
+wandb: 
+wandb: 🚀 View run fiery-sweep-7 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/uklkpetg
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_011435-uklkpetg/logs
+wandb: Agent Starting Run: 8c58b7s9 with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 8
+wandb: 	padding: 1
+wandb: 	pooling_size: 2
+wandb: 	stride: 2
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_011854-8c58b7s9
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run ancient-sweep-8
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/8c58b7s9
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 2113289
+wandb:       train_loss 2.12893
+wandb:       train_rmse 1.45908
+wandb:  validation_loss 4.39213
+wandb:  validation_rmse 2.09574
+wandb: 
+wandb: 🚀 View run ancient-sweep-8 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/8c58b7s9
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_011854-8c58b7s9/logs
+wandb: Sweep Agent: Waiting for job.
+wandb: Job received.
+wandb: Agent Starting Run: xhwitpi2 with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 16
+wandb: 	padding: 0
+wandb: 	pooling_size: 1
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_012317-xhwitpi2
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run dark-sweep-9
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/xhwitpi2
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 67538129
+wandb:       train_loss 2.24771
+wandb:       train_rmse 1.49924
+wandb:  validation_loss 4.53831
+wandb:  validation_rmse 2.13033
+wandb: 
+wandb: 🚀 View run dark-sweep-9 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/xhwitpi2
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_012317-xhwitpi2/logs
+wandb: Agent Starting Run: k3tsfhcv with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 16
+wandb: 	padding: 0
+wandb: 	pooling_size: 1
+wandb: 	stride: 2
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_012803-k3tsfhcv
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run desert-sweep-10
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/k3tsfhcv
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 16886993
+wandb:       train_loss 1.83047
+wandb:       train_rmse 1.35295
+wandb:  validation_loss 5.404
+wandb:  validation_rmse 2.32465
+wandb: 
+wandb: 🚀 View run desert-sweep-10 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/k3tsfhcv
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_012803-k3tsfhcv/logs
+wandb: Agent Starting Run: dubulgkx with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 16
+wandb: 	padding: 0
+wandb: 	pooling_size: 2
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_013227-dubulgkx
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run vague-sweep-11
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/dubulgkx
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 16886993
+wandb:       train_loss 2.27093
+wandb:       train_rmse 1.50696
+wandb:  validation_loss 5.41835
+wandb:  validation_rmse 2.32773
+wandb: 
+wandb: 🚀 View run vague-sweep-11 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/dubulgkx
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_013227-dubulgkx/logs
+wandb: Agent Starting Run: kre4xc6b with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 16
+wandb: 	padding: 0
+wandb: 	pooling_size: 2
+wandb: 	stride: 2
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_013656-kre4xc6b
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run divine-sweep-12
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/kre4xc6b
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 4224209
+wandb:       train_loss 1.71632
+wandb:       train_rmse 1.31008
+wandb:  validation_loss 4.9582
+wandb:  validation_rmse 2.2267
+wandb: 
+wandb: 🚀 View run divine-sweep-12 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/kre4xc6b
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_013656-kre4xc6b/logs
+wandb: Agent Starting Run: 71gnctcb with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 16
+wandb: 	padding: 1
+wandb: 	pooling_size: 1
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_014114-71gnctcb
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run sandy-sweep-13
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/71gnctcb
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 69565649
+wandb:       train_loss 2.14248
+wandb:       train_rmse 1.46372
+wandb:  validation_loss 5.74393
+wandb:  validation_rmse 2.39665
+wandb: 
+wandb: 🚀 View run sandy-sweep-13 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/71gnctcb
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_014114-71gnctcb/logs
+wandb: Agent Starting Run: 37p0lla4 with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 16
+wandb: 	padding: 1
+wandb: 	pooling_size: 1
+wandb: 	stride: 2
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_014603-37p0lla4
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run wild-sweep-14
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/37p0lla4
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▄▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 17393873
+wandb:       train_loss 1.99996
+wandb:       train_rmse 1.4142
+wandb:  validation_loss 5.56394
+wandb:  validation_rmse 2.3588
+wandb: 
+wandb: 🚀 View run wild-sweep-14 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/37p0lla4
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_014603-37p0lla4/logs
+wandb: Agent Starting Run: ziu88mcs with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 16
+wandb: 	padding: 1
+wandb: 	pooling_size: 2
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_015027-ziu88mcs
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run snowy-sweep-15
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/ziu88mcs
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 17393873
+wandb:       train_loss 2.10795
+wandb:       train_rmse 1.45188
+wandb:  validation_loss 5.1268
+wandb:  validation_rmse 2.26424
+wandb: 
+wandb: 🚀 View run snowy-sweep-15 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/ziu88mcs
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_015027-ziu88mcs/logs
+wandb: Agent Starting Run: j2sm08gk with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 16
+wandb: 	padding: 1
+wandb: 	pooling_size: 2
+wandb: 	stride: 2
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_015451-j2sm08gk
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run lilac-sweep-16
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/j2sm08gk
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 4224209
+wandb:       train_loss 1.64462
+wandb:       train_rmse 1.28243
+wandb:  validation_loss 4.31903
+wandb:  validation_rmse 2.07823
+wandb: 
+wandb: 🚀 View run lilac-sweep-16 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/j2sm08gk
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_015451-j2sm08gk/logs
+wandb: Agent Starting Run: 7j8ryzvn with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 32
+wandb: 	padding: 0
+wandb: 	pooling_size: 1
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_015909-7j8ryzvn
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run northern-sweep-17
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/7j8ryzvn
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 135073889
+wandb:       train_loss 2.25465
+wandb:       train_rmse 1.50155
+wandb:  validation_loss 4.95289
+wandb:  validation_rmse 2.22551
+wandb: 
+wandb: 🚀 View run northern-sweep-17 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/7j8ryzvn
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_015909-7j8ryzvn/logs
+wandb: Agent Starting Run: 999pinei with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 32
+wandb: 	padding: 0
+wandb: 	pooling_size: 1
+wandb: 	stride: 2
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_020437-999pinei
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run comic-sweep-18
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/999pinei
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 33771617
+wandb:       train_loss 2.07125
+wandb:       train_rmse 1.43918
+wandb:  validation_loss 5.37959
+wandb:  validation_rmse 2.31939
+wandb: 
+wandb: 🚀 View run comic-sweep-18 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/999pinei
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_020437-999pinei/logs
+wandb: Sweep Agent: Waiting for job.
+wandb: Job received.
+wandb: Agent Starting Run: 5qrlkm9a with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 32
+wandb: 	padding: 0
+wandb: 	pooling_size: 2
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_020918-5qrlkm9a
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run bumbling-sweep-19
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/5qrlkm9a
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 33771617
+wandb:       train_loss 2.72406
+wandb:       train_rmse 1.65047
+wandb:  validation_loss 4.56123
+wandb:  validation_rmse 2.1357
+wandb: 
+wandb: 🚀 View run bumbling-sweep-19 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/5qrlkm9a
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_020918-5qrlkm9a/logs
+wandb: Agent Starting Run: wqwbgmhp with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 32
+wandb: 	padding: 0
+wandb: 	pooling_size: 2
+wandb: 	stride: 2
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_021354-wqwbgmhp
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run electric-sweep-20
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/wqwbgmhp
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb: total_parameters ▁
+wandb:       train_loss █▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       train_rmse █▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:  validation_rmse █▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb: total_parameters 8446049
+wandb:       train_loss 2.29912
+wandb:       train_rmse 1.51629
+wandb:  validation_loss 5.22279
+wandb:  validation_rmse 2.28534
+wandb: 
+wandb: 🚀 View run electric-sweep-20 at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/wqwbgmhp
+wandb: ⭐️ View project at: https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20241124_021354-wqwbgmhp/logs
+wandb: Agent Starting Run: pzxuuhc0 with config:
+wandb: 	activation_fn: ReLU
+wandb: 	batch_size: 32
+wandb: 	conv_dropout: 0
+wandb: 	epochs: 30
+wandb: 	hidden_units: 64
+wandb: 	kernel_size: 3x3
+wandb: 	learning_rate: 0.0001
+wandb: 	linear_dropout: 0
+wandb: 	momentum: 0.9
+wandb: 	num_conv_layers: 1
+wandb: 	num_fc_layers: 3
+wandb: 	optimizer: SGD
+wandb: 	out_channels: 32
+wandb: 	padding: 1
+wandb: 	pooling_size: 1
+wandb: 	stride: 1
+wandb: 	use_cnn_batchnorm: True
+wandb: 	use_fc_batchnorm: True
+wandb: 	weight_decay: 1e-05
+wandb: 	weights_init: Uniform
+wandb: Tracking run with wandb version 0.18.6
+wandb: Run data is saved locally in /zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97/wandb/run-20241124_021812-pzxuuhc0
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run winter-sweep-21
+wandb: ⭐️ View project at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097
+wandb: 🧹 View sweep at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/sweeps/h20eafrb
+wandb: 🚀 View run at https://wandb.ai/raimo-sieber-technical-university-of-munich/Deep%20Learning%20Project%20Group%2097/runs/pzxuuhc0

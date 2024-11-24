@@ -1,0 +1,65 @@
+Running script...
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@hpc.dtu.dk>
+Subject: Job 23243518: <Sweep_hopeful826_optimizer_GRID> in cluster <dcc> Done
+
+Job <Sweep_hopeful826_optimizer_GRID> was submitted from host <n-62-20-1> by user <s242186> in cluster <dcc> at Fri Nov 22 17:58:33 2024
+Job was executed on host(s) <4*n-62-12-24>, in queue <gpua100>, as user <s242186> in cluster <dcc> at Fri Nov 22 18:49:24 2024
+</zhome/fb/0/212723> was used as the home directory.
+</zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97> was used as the working directory.
+Started at Fri Nov 22 18:49:24 2024
+Terminated at Fri Nov 22 21:50:13 2024
+Results reported at Fri Nov 22 21:50:13 2024
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/sh
+#BSUB -q gpua100
+#BSUB -J Sweep_hopeful826_optimizer_GRID
+### number of core
+#BSUB -n 4
+### specify that all cores should be on the same host
+#BSUB -gpu "num=1:mode=exclusive_process"
+### specify the memory needed
+#BSUB -R "rusage[mem=10GB]"
+### Number of hours needed
+#BSUB -W 71:59
+### added outputs and errors to files
+#BSUB -o outputs/Output_%J.out
+#BSUB -e outputs/Error_%J.err
+
+echo "Running script..."
+
+module load cuda/11.8
+module load python3/3.10.13
+source ~/DL/p4_velocity/DL_97_venv/bin/activate
+python3 ~/DL/p4_velocity/git/DeepLearning97/scripts/modular_train_test.py > log/modular_train_test$(date +"%d-%m-%y")_$(date +'%H:%M:%S').log
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   23641.00 sec.
+    Max Memory :                                 1718 MB
+    Average Memory :                             1173.83 MB
+    Total Requested Memory :                     40960.00 MB
+    Delta Memory :                               39242.00 MB
+    Max Swap :                                   -
+    Max Processes :                              11
+    Max Threads :                                77
+    Run time :                                   10849 sec.
+    Turnaround time :                            13900 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <outputs/Error_23243518.err> for stderr output of this job.
+

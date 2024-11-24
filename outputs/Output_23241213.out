@@ -1,0 +1,66 @@
+Running script...
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@hpc.dtu.dk>
+Subject: Job 23241213: <Sweep_RANDOM_1> in cluster <dcc> Exited
+
+Job <Sweep_RANDOM_1> was submitted from host <n-62-20-1> by user <s242186> in cluster <dcc> at Thu Nov 21 23:33:54 2024
+Job was executed on host(s) <4*n-62-12-23>, in queue <gpua100>, as user <s242186> in cluster <dcc> at Fri Nov 22 03:43:56 2024
+</zhome/fb/0/212723> was used as the home directory.
+</zhome/fb/0/212723/DL/p4_velocity/git/DeepLearning97> was used as the working directory.
+Started at Fri Nov 22 03:43:56 2024
+Terminated at Fri Nov 22 11:06:59 2024
+Results reported at Fri Nov 22 11:06:59 2024
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/sh
+#BSUB -q gpua100
+#BSUB -J Sweep_RANDOM_1
+### number of core
+#BSUB -n 4
+### specify that all cores should be on the same host
+#BSUB -gpu "num=1:mode=exclusive_process"
+### specify the memory needed
+#BSUB -R "rusage[mem=10GB]"
+### Number of hours needed
+#BSUB -W 71:59
+### added outputs and errors to files
+#BSUB -o outputs/Output_%J.out
+#BSUB -e outputs/Error_%J.err
+
+echo "Running script..."
+
+module load cuda/11.8
+module load python3/3.10.13
+source ~/DL/p4_velocity/DL_97_venv/bin/activate
+python3 ~/DL/p4_velocity/git/DeepLearning97/scripts/modular_train_test.py > log/modular_train_test$(date +"%d-%m-%y")_$(date +'%H:%M:%S').log
+
+------------------------------------------------------------
+
+TERM_MEMLIMIT: job killed after reaching LSF memory usage limit.
+Exited with exit code 137.
+
+Resource usage summary:
+
+    CPU time :                                   52092.00 sec.
+    Max Memory :                                 40960 MB
+    Average Memory :                             2167.66 MB
+    Total Requested Memory :                     40960.00 MB
+    Delta Memory :                               0.00 MB
+    Max Swap :                                   -
+    Max Processes :                              11
+    Max Threads :                                73
+    Run time :                                   26583 sec.
+    Turnaround time :                            41585 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <outputs/Error_23241213.err> for stderr output of this job.
+

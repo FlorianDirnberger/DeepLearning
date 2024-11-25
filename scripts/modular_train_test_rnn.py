@@ -145,6 +145,19 @@ def train_one_epoch(loss_fn, model, data_loader, optimizer):
 
     return running_loss / len(data_loader) # no intermediate logging for batches here, not needed training is fast 
 
+def evaluate_model(loss_fn, model, data_loader):
+    model.eval()  # Set the model to evaluation mode
+    total_loss = 0.0
+
+    with torch.no_grad():  # No need to calculate gradients during evaluation
+        for batch in data_loader:
+            timeseries, labels = batch["timeseries"].to(DEVICE), batch["label"].to(DEVICE)
+            outputs = model(timeseries)
+            loss = loss_fn(outputs.squeeze(), labels)
+            total_loss += loss.item()
+
+    return total_loss / len(data_loader)
+
 
 def train():
     with wandb.init(project="DeepLearning-scripts", config={
@@ -189,11 +202,23 @@ def train():
 
         for epoch in range(config.epochs):
             train_loss = train_one_epoch(loss_fn, model, train_loader, optimizer)
-            rmse = train_loss**0.5
-            print(f"Epoch {epoch + 1}/{config.epochs}, Train Loss: {train_loss:.4f}, RMSE: {rmse:.3f}")
+            train_rmse = train_loss**0.5
+            
+            test_loss = evaluate_model(loss_fn,model, test_loader)
+            test_rmse = test_loss**0.5 
+            
+            print(f"Epoch {epoch + 1}/{config.epochs}, "
+                  f"Train Loss: {train_loss:.4f}, Train RMSE: {train_rmse:.3f}, "
+                  f"Test Loss: {test_loss:.4f}, Test RMSE: {test_rmse:.3f}")
             
             # wandb logging 
-            wandb.log({"epoch": epoch + 1, "train_loss": train_loss, "rmse": rmse })
+            wandb.log({
+                "epoch": epoch + 1,
+                "train_loss": train_loss,
+                "train_rmse": train_rmse,
+                "test_loss": test_loss,
+                "test_rmse": test_rmse
+            })
 
         torch.save(model.state_dict(), MODEL_DIR / f"RNN_model_{wandb.run.name}.pth")
         print("Training complete. Model saved.")

@@ -162,8 +162,11 @@ def evaluate_model(loss_fn, model, data_loader):
 def train():
     with wandb.init(project="DeepLearning-scripts", config={
         "batch_size": 32,
+        "mode": "GRU", 
         "hidden_size": 128,
         "learning_rate": 0.0001,
+        "num_layers": 1, 
+        "dropout": 0.0,
         "epochs": 100
     }) as run:
         config = run.config
@@ -181,14 +184,17 @@ def train():
         # Determine input size
         sample = next(iter(train_loader))
         timeseries_shape = sample['timeseries'].shape  # [batch_size, seq_len, feature_dim1, feature_dim2]
-        print("Shape check in training", timeseries_shape) # output ([32, 4, 1600, 2])
+        print("Shape check in training", timeseries_shape) # output ([32,1600, 8])
         input_size = timeseries_shape[-1]  # input size is the number of features 
         
         # load the RNN model 
         model = RNN(
-            input_size=input_size,
-            hidden_size=config.hidden_size,
-            output_size=1,
+            mode = config.mode,
+            input_size = input_size,
+            hidden_size = config.hidden_size,
+            num_layers = config.num_layers,
+            dropout = config.dropout, 
+            output_size = 1,
         ).to(DEVICE)
         
         model.apply(weights_init_uniform_rule)
@@ -239,6 +245,10 @@ def weights_init_uniform_rule(m):
                 nn.init.uniform_(param, -0.1, 0.1)
             elif "bias" in name:  # Initialize biases
                 nn.init.uniform_(param, -0.1, 0.1)
+
+sweep_config={
+    
+}
 
 if __name__ == "__main__":
     test_dataset = False

@@ -160,19 +160,21 @@ def evaluate_model(loss_fn, model, data_loader):
 
 
 def train():
-    with wandb.init(project="DeepLearning-scripts", config={
-        "batch_size": 32,
-        "mode": "GRU", 
-        "hidden_size": 128,
-        "learning_rate": 0.0001,
-        "num_layers": 1, 
-        "dropout": 0.0,
-        "epochs": 100
-    }) as run:
-        config = run.config
+    with wandb.init(
+        project="DeepLearning-scripts",
+        config={
+            "batch_size": 32,
+            "mode": "GRU",
+            "hidden_size": 128,
+            "learning_rate": 0.0001,
+            "num_layers": 1,
+            "dropout": 0.0,
+            "epochs": 100,
+        }
+    ) as run:
+        config = run.config  # This will now have all default values
         
-
-        #load the data 
+        # Load the data
         data_dir = DATA_ROOT / DATA_SUBDIR
         stmf_data_path = DATA_ROOT / STM_FILENAME
         dataset_train = TimeSeriesDataset(data_dir / "train", stmf_data_path, fixed_length=FIXED_LENGTH)
@@ -183,51 +185,72 @@ def train():
 
         # Determine input size
         sample = next(iter(train_loader))
-        timeseries_shape = sample['timeseries'].shape  # [batch_size, seq_len, feature_dim1, feature_dim2]
-        print("Shape check in training", timeseries_shape) # output ([32,1600, 8])
-        input_size = timeseries_shape[-1]  # input size is the number of features 
+        timeseries_shape = sample['timeseries'].shape  # [batch_size, seq_len, feature_dim]
+        print("Shape check in training", timeseries_shape)  # Output ([32,1600,8])
+        input_size = timeseries_shape[-1]  # Input size is the number of features
         
-        # load the RNN model 
+        # Load the RNN model
         model = RNN(
-            mode = config.mode,
-            input_size = input_size,
-            hidden_size = config.hidden_size,
-            num_layers = config.num_layers,
-            dropout = config.dropout, 
-            output_size = 1,
+            mode=config.mode,
+            input_size=input_size,
+            hidden_size=config.hidden_size,
+            num_layers=config.num_layers,
+            dropout=config.dropout,
+            output_size=1,
         ).to(DEVICE)
-        
+
         model.apply(weights_init_uniform_rule)
-        
-        # Set optimizer and loss 
+
+        # Set optimizer and loss
         optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=0.9)
         loss_fn = nn.MSELoss()
-
 
         print(f"Starting training for {config.epochs} epochs...")
 
         for epoch in range(config.epochs):
             train_loss = train_one_epoch(loss_fn, model, train_loader, optimizer)
-            train_rmse = train_loss**0.5
-            
-            test_loss = evaluate_model(loss_fn,model, test_loader)
-            test_rmse = test_loss**0.5 
-            
+            train_rmse = train_loss ** 0.5
+
+            test_loss = evaluate_model(loss_fn, model, test_loader)
+            test_rmse = test_loss ** 0.5
+
             print(f"Epoch {epoch + 1}/{config.epochs}, "
                   f"Train Loss: {train_loss:.4f}, Train RMSE: {train_rmse:.3f}, "
                   f"Test Loss: {test_loss:.4f}, Test RMSE: {test_rmse:.3f}")
-            
-            # wandb logging 
+
+            # WandB logging
             wandb.log({
                 "epoch": epoch + 1,
                 "train_loss": train_loss,
                 "train_rmse": train_rmse,
                 "test_loss": test_loss,
-                "test_rmse": test_rmse
+                "test_rmse": test_rmse,
             })
 
         torch.save(model.state_dict(), MODEL_DIR / f"RNN_model_{wandb.run.name}.pth")
         print("Training complete. Model saved.")
+
+sweep_config = {
+    'method': 'random',
+    'metric': {'name': 'test_rmse', 'goal': 'minimize'},
+    'parameters': {
+        'mode': {
+            'values': ["GRU"]},
+        'hidden_size': {
+            'values': [32]},
+        'learning_rate': {
+            'values': [0.001]},
+        'num_layers': {
+            'values': [1]},
+        'dropout': {  # Corrected from 'droput' to 'dropout'
+            'values': [0.0]},
+        'epochs': {
+            'values': [100]},
+        'batch_size': {  # Ensure this matches the key you use in the training code
+            'values': [32]
+        }
+    }
+}
 
 
 def weights_init_uniform_rule(m):
@@ -245,10 +268,7 @@ def weights_init_uniform_rule(m):
                 nn.init.uniform_(param, -0.1, 0.1)
             elif "bias" in name:  # Initialize biases
                 nn.init.uniform_(param, -0.1, 0.1)
-
-sweep_config={
-    
-}
+   
 
 if __name__ == "__main__":
     test_dataset = False

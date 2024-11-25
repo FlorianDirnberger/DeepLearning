@@ -58,41 +58,56 @@ class TimeSeriesDataset(Dataset):
 
         try:
             with open(data_path, 'rb') as f:
-                timeseries_data = pickle.load(f)
+                timeseries_data = pickle.load(f) # data here is in dictionary format 
+                #print(timeseries_data)
+                #print(len(timeseries_data)) # get the keys (3) of the dictionary
+                #print(timeseries_data.values) # get the values 
+                # Inspect the structure
+                #print("Keys:", timeseries_data.keys())  # Print all the keys
+                #print("Number of keys:", len(timeseries_data))  # Count of keys
+                #print("Sample values for each key:")
                 
-                # Ensure the file contains a dictionary with 'samples'
+                # for key, value in timeseries_data.items():
+                #     print(f"  Key: {key}")  
+                #     print(f"    Type: {type(value)}")
+                #     print(f"    Sample data: {repr(value)[:100]}")  # Preview the first 100 characters
+                    
+                #     key1: samples, list of complex values 
+                #     key2: sample_rate, float 
+                #     key3: f0_tuple 
+            
+                
+                # Ensure the file contains a dictionary with 'samples' 
                 if isinstance(timeseries_data, dict) and 'samples' in timeseries_data:
-                    samples = timeseries_data['samples']
+                    samples = timeseries_data['samples'] # extract the samples a list of complex numbers 
+                    #print("Samples", samples)
                 else:
                     raise ValueError(f"Invalid file format or missing 'samples' key in {data_path}")
 
                 # Ensure the data is a numpy array
                 if not isinstance(samples, np.ndarray):
                     samples = np.array(samples)
+                    #print("Samples Array", samples)
 
-                # Convert complex-valued data to real-imaginary representation
+                # Convert complex-valued data to real-imaginary representation columns represent real and imaginary data
                 if np.iscomplexobj(samples):
                     samples = np.stack([samples.real, samples.imag], axis=-1)  # Adds last dimension for (real, imag)
+                    #print("samples real-imaginary", samples)
+                    #print(samples.shape) #(4,1600,2) 
+                    # Tensor with 4 channels 1600 data points with real and imaginary data each 
 
-                # Ensure the data is at least 2D for padding or truncation
-                if samples.ndim == 1:
-                    samples = samples[:, np.newaxis]  # Convert 1D to 2D
-
-                # Handle the first dimension independently
-                target_dim1 = 1600  # Target length for the first dimension
-                if samples.shape[0] > target_dim1:
-                    samples = samples[:target_dim1, ...]  # Truncate along the first axis
-                elif samples.shape[0] < target_dim1:
-                    padding_dim1 = target_dim1 - samples.shape[0]
-                    samples = np.pad(samples, [(0, padding_dim1)] + [(0, 0)] * (samples.ndim - 1), mode='constant')
-
-                # Handle the second dimension independently
-                target_dim2 = 1600  # Target length for the second dimension
-                if samples.shape[1] > target_dim2:
-                    samples = samples[:, :target_dim2, ...]  # Truncate along the second axis
-                elif samples.shape[1] < target_dim2:
-                    padding_dim2 = target_dim2 - samples.shape[1]
-                    samples = np.pad(samples, [(0, 0), (0, padding_dim2)] + [(0, 0)] * (samples.ndim - 2), mode='constant')
+                # Handle the second dimension (time steps) independently
+                target_dim1 = 1600  # Target length for the time dimension
+                if samples.shape[1] > target_dim1:
+                    samples = samples[:, :target_dim1, ...]  # Truncate along the second axis
+                elif samples.shape[1] < target_dim1:
+                    padding_dim1 = target_dim1 - samples.shape[1]
+                    samples = np.pad(samples, [(0, 0), (0, padding_dim1)] + [(0, 0)] * (samples.ndim - 2), mode='constant')
+                    
+                # Flatten channels and features into a single feature dimension
+                samples = samples.transpose(1, 0, 2).reshape(samples.shape[1], -1)  # Shape: [1600, 8]
+                # Final shape check
+                #print("Final samples shape:", samples.shape) # (1600, 8) (timeseries, features)
 
         except Exception as e:
             print(f"Error reading file {data_path}: {e}")
@@ -107,17 +122,10 @@ class TimeSeriesDataset(Dataset):
             'timeseries': torch.tensor(samples, dtype=torch.float32),
             'label': torch.tensor(label, dtype=torch.float32)
         }
-
-        # Debugging output
-        #print(f"Index: {idx}, Sample ID: {sample_id}")
-        #print(f"Timeseries Shape: {data['timeseries'].shape}")
-        #print(f"Label: {data['label']}")
         
         return data
         
         
-
-
 
 def train_one_epoch(loss_fn, model, data_loader, optimizer):
     model.train()
@@ -125,6 +133,7 @@ def train_one_epoch(loss_fn, model, data_loader, optimizer):
 
     for batch in data_loader:
         timeseries, labels = batch["timeseries"].to(DEVICE), batch["label"].to(DEVICE)
+        #print("Dim check training:", timeseries.shape)
 
         optimizer.zero_grad()
         outputs = model(timeseries)
@@ -134,18 +143,20 @@ def train_one_epoch(loss_fn, model, data_loader, optimizer):
 
         running_loss += loss.item()
 
-    return running_loss / len(data_loader)
+    return running_loss / len(data_loader) # no intermediate logging for batches here, not needed training is fast 
 
 
 def train():
     with wandb.init(project="DeepLearning-scripts", config={
         "batch_size": 32,
         "hidden_size": 128,
-        "learning_rate": 0.001,
+        "learning_rate": 0.0001,
         "epochs": 100
     }) as run:
         config = run.config
+        
 
+        #load the data 
         data_dir = DATA_ROOT / DATA_SUBDIR
         stmf_data_path = DATA_ROOT / STM_FILENAME
         dataset_train = TimeSeriesDataset(data_dir / "train", stmf_data_path, fixed_length=FIXED_LENGTH)
@@ -157,23 +168,29 @@ def train():
         # Determine input size
         sample = next(iter(train_loader))
         timeseries_shape = sample['timeseries'].shape  # [batch_size, seq_len, feature_dim1, feature_dim2]
-        input_size = timeseries_shape[-2] * timeseries_shape[-1]  # feature_dim1 * feature_dim2
-
+        print("Shape check in training", timeseries_shape) # output ([32, 4, 1600, 2])
+        input_size = timeseries_shape[-1]  # input size is the number of features 
+        
+        # load the RNN model 
         model = RNN(
             input_size=input_size,
             hidden_size=config.hidden_size,
             output_size=1,
         ).to(DEVICE)
+        
         model.apply(weights_init_uniform_rule)
-
+        
+        # Set optimizer and loss 
         optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=0.9)
         loss_fn = nn.MSELoss()
+
 
         print(f"Starting training for {config.epochs} epochs...")
 
         for epoch in range(config.epochs):
             train_loss = train_one_epoch(loss_fn, model, train_loader, optimizer)
-            print(f"Epoch {epoch + 1}/{config.epochs}, Train Loss: {train_loss:.4f}")
+            rmse = train_loss**0.5
+            print(f"Epoch {epoch + 1}/{config.epochs}, Train Loss: {train_loss:.4f}, RMSE: {rmse:.3f}")
 
             wandb.log({"epoch": epoch + 1, "train_loss": train_loss})
 

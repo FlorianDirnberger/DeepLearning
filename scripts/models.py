@@ -6,18 +6,18 @@ from datasets import SpectrogramDataset
 class RNN(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super(RNN, self).__init__()
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers=1, batch_first=False, dropout=0.0)
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers=3, batch_first=False, dropout=0.0)
         self.bn = nn.BatchNorm1d(hidden_size)
         self.fc = nn.Sequential(
             nn.Linear(hidden_size, 128),
             nn.ReLU(),
-            nn.Dropout(0.1),
+            nn.Dropout(0.0),
             nn.Linear(128, output_size)
         )
 
     def forward(self, x):
-        batch_size, seq_len, feature_dim1, feature_dim2 = x.shape
-        input_size = feature_dim1 * feature_dim2
+        batch_size, seq_len, feature_dim = x.shape
+        input_size = feature_dim
         x = x.view(batch_size, seq_len, input_size)
         x = x.permute(1, 0, 2)  # [seq_len, batch_size, input_size]
 

@@ -191,8 +191,9 @@ def train():
             train_loss = train_one_epoch(loss_fn, model, train_loader, optimizer)
             rmse = train_loss**0.5
             print(f"Epoch {epoch + 1}/{config.epochs}, Train Loss: {train_loss:.4f}, RMSE: {rmse:.3f}")
-
-            wandb.log({"epoch": epoch + 1, "train_loss": train_loss})
+            
+            # wandb logging 
+            wandb.log({"epoch": epoch + 1, "train_loss": train_loss, "rmse": rmse })
 
         torch.save(model.state_dict(), MODEL_DIR / f"RNN_model_{wandb.run.name}.pth")
         print("Training complete. Model saved.")

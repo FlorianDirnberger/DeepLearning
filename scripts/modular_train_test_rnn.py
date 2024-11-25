@@ -160,18 +160,7 @@ def evaluate_model(loss_fn, model, data_loader):
 
 
 def train():
-    with wandb.init(
-        project="DeepLearning-scripts",
-        config={
-            "batch_size": 32,
-            "mode": "GRU",
-            "hidden_size": 128,
-            "learning_rate": 0.0001,
-            "num_layers": 1,
-            "dropout": 0.0,
-            "epochs": 100,
-        }
-    ) as run:
+    with wandb.init() as run:
         config = run.config  # This will now have all default values
         
         # Load the data
@@ -272,6 +261,8 @@ def weights_init_uniform_rule(m):
 
 if __name__ == "__main__":
     test_dataset = False
+    sweep_id = wandb.sweep(sweep_config, project="DeepLearning-scripts")
+    wandb.agent(sweep_id, function=train, count=10)  # Run the sweep with 10 runs
 
     if test_dataset:
         data_dir = DATA_ROOT / DATA_SUBDIR / "train"

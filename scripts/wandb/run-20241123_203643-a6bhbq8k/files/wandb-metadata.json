@@ -1,0 +1,49 @@
+{
+  "os": "Linux-6.1.118-1.el9.elrepo.x86_64-x86_64-with-glibc2.34",
+  "python": "3.9.18",
+  "startedAt": "2024-11-23T19:36:43.958977Z",
+  "program": "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py",
+  "codePath": "scripts/modular_train_test.py",
+  "git": {
+    "remote": "https://github.com/FlorianDirnberger/DeepLearning97",
+    "commit": "41dc59569b0ee2858dcf5ca7cf6d19ea81d92131"
+  },
+  "email": "s232735@dtu.dk",
+  "root": "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts",
+  "host": "n-62-20-1",
+  "username": "s232735",
+  "executable": "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/bin/python",
+  "codePathLocal": "modular_train_test.py",
+  "cpu_count": 24,
+  "cpu_count_logical": 24,
+  "gpu": "Tesla V100-PCIE-16GB",
+  "gpu_count": 2,
+  "disk": {
+    "/": {
+      "total": "76817485824",
+      "used": "5912092672"
+    }
+  },
+  "memory": {
+    "total": "201904594944"
+  },
+  "cpu": {
+    "count": 24,
+    "countLogical": 24
+  },
+  "gpu_nvidia": [
+    {
+      "name": "Tesla V100-PCIE-16GB",
+      "memoryTotal": "17179869184",
+      "cudaCores": 5120,
+      "architecture": "Volta"
+    },
+    {
+      "name": "Tesla V100-PCIE-16GB",
+      "memoryTotal": "17179869184",
+      "cudaCores": 5120,
+      "architecture": "Volta"
+    }
+  ],
+  "cudaVersion": "12.7"
+}

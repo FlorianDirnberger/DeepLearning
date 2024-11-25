@@ -1,20 +1,49 @@
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 from numpy import log10
+import numpy as np
 import torch
+from torch import Tensor
 from torchvision.transforms import transforms
 from torch.utils.data import DataLoader
 import wandb
-import torch.nn as nn
-from dotenv import load_dotenv
-import os
-
-from custom_transforms import LoadSpectrogram, NormalizeSpectrogram, ToTensor, InterpolateSpectrogram
+import matplotlib.pyplot as plt
+from custom_transforms import LoadSpectrogram, NormalizeSpectrogram, ToTensor, InterpolateSpectrogram, Prepro
 from data_management import make_dataset_name
-#from models import SpectrVelCNNRegr, CNN_97, weights_init_uniform_rule
-from models import CNN_97, weights_init_uniform_rule, weights_init
-
+from models import SpectrVelCNNRegr, weights_init_uniform_rule
+from typing import Union, Optional
 # GROUP NUMBER
 GROUP_NUMBER = 97
+
+# CONSTANTS TO MODIFY AS YOU WISH
+MODEL = SpectrVelCNNRegr
+LEARNING_RATE = 10**-5
+EPOCHS = 300 # the model converges in test perfermance after ~250-300 epochs
+BATCH_SIZE = 10
+NUM_WORKERS = 4
+OPTIMIZER = torch.optim.SGD
+DEVICE = (
+    "cuda"
+    if torch.cuda.is_available()
+    else "mps"
+    if torch.backends.mps.is_available()
+    else "cpu"
+)
+#DEVICE = "cpu"
+# Load environment variables from .env file
+load_dotenv()
+
+# Use the API key from the environment variable
+wandb_api_key = os.getenv("WANDB_API_KEY")
+wandb.login(key=wandb_api_key)
+
+
+# You can set the model path name in case you want to keep training it.
+# During the training/testing loop, the model state is saved
+# (only the best model so far is saved)
+LOAD_MODEL_FNAME = None
+# LOAD_MODEL_FNAME = f"model_{MODEL.__name__}_bright-candle-20"
 
 # CONSTANTS TO LEAVE
 DATA_ROOT = Path(f"/dtu-compute/02456-p4-e24/data") 
@@ -24,26 +53,70 @@ STMF_FILENAME = "stmf_data_3.csv"
 NFFT = 512
 TS_CROPTWIDTH = (-150, 200)
 VR_CROPTWIDTH = (-60, 15)
-DEVICE = "cpu"
+
+# Define the save directory using Path and expand the user home directory
+#save_dir = Path('~/my_project_dir/DeepLearning97/outputs').expanduser()
+
+# Create the directory if it doesn't exist
+#save_dir.mkdir(parents=True, exist_ok=True)
+
+def plot_spectrogram_with_annotations(
+    spectrogram: Union[Tensor, np.ndarray],
+    spectrogram_channel: int = 0,
+    save_path: Optional[Union[str, Path]] = None
+) -> None:
+    """Plot spectrogram for the specified channel.
+
+    Args:
+        spectrogram (Union[Tensor, np.ndarray]): Input spectrogram to plot.
+        spectrogram_channel (int, optional): Spectrogram channel to plot. Defaults to 0.
+        save_path (Optional[Union[str, Path]], optional): Path to save the plot image. If None, displays the plot.
+    """
+    # If the spectrogram is a tensor, convert it to numpy array
+    if isinstance(spectrogram, Tensor):
+        spectrogram = spectrogram.cpu().numpy()
+    elif not isinstance(spectrogram, np.ndarray):
+        raise TypeError("spectrogram must be a Tensor or ndarray")
+
+    # Select the specified channel
+    spectrogram_channel_data = spectrogram[spectrogram_channel, :, :]
+
+    # Use the spectrogram data for plotting
+    spectrogram_to_plot = spectrogram_channel_data
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    plt.imshow(
+        spectrogram_to_plot,
+        aspect="auto",
+        origin="lower",
+        cmap="jet"
+    )
+    plt.colorbar(label='Amplitude')
+    plt.xlabel("Time [s]")
+    plt.ylabel("Radial Velocity [m/s]")
+    plt.title(f"Spectrogram - Channel {spectrogram_channel}")
+
+    # Save or display the plot
+    if save_path:
+        save_path = Path(save_path).expanduser()
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(save_path)
+        plt.close()
+        print(f"Plot saved to {save_path}")
+    else:
+        plt.show()
 
 
-# Load environment variables from .env file
-load_dotenv()
 
-# Use the API key from the environment variable
-wandb_api_key = os.getenv("WANDB_API_KEY")
-wandb.login(key=wandb_api_key)
-
-
-def train_one_epoch(loss_fn, model, train_data_loader, optimizer):
+def train_one_epoch(loss_fn, model, train_data_loader):
     running_loss = 0.
+    last_loss = 0.
     total_loss = 0.
 
     for i, data in enumerate(train_data_loader):
         spectrogram, target = data["spectrogram"].to(DEVICE), data["target"].to(DEVICE)
-        
-        #print(f"Batch {i} - Spectrogram shape: {spectrogram.shape}, Target shape: {target.shape}")
-        
+
         optimizer.zero_grad()
 
         outputs = model(spectrogram)
@@ -59,282 +132,158 @@ def train_one_epoch(loss_fn, model, train_data_loader, optimizer):
         running_loss += loss.item()
         total_loss += loss.item()
         if i % train_data_loader.batch_size == train_data_loader.batch_size - 1:
-            last_loss = running_loss / train_data_loader.batch_size
-            print(f'  batch {i + 1} loss: {last_loss}')
+            last_loss = running_loss / train_data_loader.batch_size # loss per batch
+            print('  batch {} loss: {}'.format(i + 1, last_loss))
             running_loss = 0.
 
     return total_loss / (i+1)
 
-def train():
-    with wandb.init() as run:
-        config = run.config
-        #activation_fn = nn.ReLU
-        activation_fn_map = {
-            'ReLU': nn.ReLU,
-            'LeakyReLU': nn.LeakyReLU,
-            'Tanh': nn.Tanh,
-            'Sigmoid': nn.Sigmoid,
-            'Swish': nn.SiLU,
-            'Mish': nn.Mish
-        }
-        kernel_size_map = {
-            '3x3': (3, 3), 
-            '5x5': (5, 5),
-            '7x7': (7, 7), 
-            '1x3': (1, 3), 
-            '3x1': (3, 1), 
-            '3x5': (3, 5), 
-            '5x3': (5, 3), 
-            '3x7': (3, 7), 
-            '7x3': (7, 3)
-        }
-
-        
-
-        # Initialize model with the current WandB configuration
-        model = CNN_97(
-            num_conv_layers = config.num_conv_layers,
-            num_fc_layers=config.num_fc_layers,
-            conv_dropout=config.conv_dropout,
-            linear_dropout=config.linear_dropout,
-            kernel_size=kernel_size_map[config.kernel_size],
-            activation=activation_fn_map[config.activation_fn],
-            hidden_units=config.hidden_units,
-            padding = config.padding,
-            stride = config.stride,
-            pooling_size = config.pooling_size,
-            out_channels = config.out_channels,
-            use_fc_batchnorm = config.use_fc_batchnorm,
-            use_cnn_batchnorm = config.use_cnn_batchnorm 
-        ).to(DEVICE)
-
-        # Weight initializations depending on activation function
-        weights_init_map = {
-            'Uniform': lambda m: weights_init_uniform_rule(m),
-            'Xavier_uniform': lambda m: weights_init(m, init_type='Xavier_uniform'),
-            'Xavier_normal': lambda m: weights_init(m, init_type='Xavier_normal'),
-            'Kaiming_uniform': lambda m: weights_init(m, init_type='Kaiming_uniform'),
-            'Kaiming_normal': lambda m: weights_init(m, init_type='Kaiming_normal')
-        }
-        valid_activation_init_combinations = {
-            'ReLU': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal'],
-            'LeakyReLU': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal'],
-            'Tanh': ['Uniform', 'Xavier_uniform', 'Xavier_normal'],
-            'Sigmoid': ['Uniform', 'Xavier_uniform', 'Xavier_normal'],
-            'Swish': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal'],
-            'Mish': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal']
-        }
-        if config.weights_init not in valid_activation_init_combinations[config.activation_fn]:
-            #print(f"Invalid combination: {config.activation_fn} + {config.weights_init}") # debugging
-            return # skips the current run
-
-        model.apply(weights_init_map[config.weights_init])
-
-
-        # Optimizer mapping
-        optimizer_map = {
-            'SGD': torch.optim.SGD,
-            'Adam': torch.optim.Adam,
-            'AdamW': torch.optim.AdamW,
-            'AdaGrad': torch.optim.Adagrad
-        }
-
-        # To avoid redundant runs
-        valid_optimizer_weight_decay_combinations = {
-            'SGD': sweep_config['parameters']['weight_decay']['values'],
-            'Adam': [sweep_config['parameters']['weight_decay']['values'][0]],
-            'AdamW': sweep_config['parameters']['weight_decay']['values'],
-            'AdaGrad': [sweep_config['parameters']['weight_decay']['values'][0]]
-        }
-
-        valid_optimizer_momentum_combinations = {
-            'SGD': sweep_config['parameters']['momentum']['values'],
-            'Adam': [sweep_config['parameters']['momentum']['values'][0]],
-            'AdamW': [sweep_config['parameters']['momentum']['values'][0]],
-            'AdaGrad': [sweep_config['parameters']['momentum']['values'][0]]
-        }
-
-        if config.weight_decay not in valid_optimizer_weight_decay_combinations[config.optimizer]:
-            print(f"Invalid combination: {config.optimizer} + {config.weight_decay}")
-            return # skips the current run
-        
-        if config.momentum not in valid_optimizer_momentum_combinations[config.optimizer]:
-            print(f"Invalid combination: {config.optimizer} + {config.weight_decay} + {config.momentum}")
-            return # skips the current run
-
-        if config.optimizer == 'SGD':
-            optimizer_params = {
-                'params': model.parameters(),
-                'lr': config.learning_rate,
-                'weight_decay': config.weight_decay,
-                'momentum': config.momentum 
-            }
-        
-        elif config.optimizer == 'AdamW':
-            optimizer_params = {
-                'params': model.parameters(),
-                'lr': config.learning_rate,
-                'weight_decay': config.weight_decay  # Only for AdamW
-            }
-
-        else:  # For Adam and AdaGrad
-            optimizer_params = {
-                'params': model.parameters(),
-                'lr': config.learning_rate          # Basic parameters for Adam and AdaGrad
-            }
-
-
-        # print(f"Optimizer params for {config.optimizer}: {optimizer_params}")
-        optimizer = optimizer_map[config.optimizer](**optimizer_params)
-
-        loss_fn = model.loss_fn
-
-        # Data Setup
-        dataset_name = make_dataset_name(nfft=NFFT, ts_crop_width=TS_CROPTWIDTH, vr_crop_width=VR_CROPTWIDTH)
-        data_dir = DATA_ROOT / dataset_name
-
-        TRAIN_TRANSFORM = transforms.Compose([
-            LoadSpectrogram(root_dir=data_dir / "train"),
-            NormalizeSpectrogram(),
-            ToTensor(),
-            InterpolateSpectrogram()
-        ])
-        TEST_TRANSFORM = transforms.Compose([
-            LoadSpectrogram(root_dir=data_dir / "test"),
-            NormalizeSpectrogram(),
-            ToTensor(),
-            InterpolateSpectrogram()
-        ])
-
-        dataset_train = model.dataset(data_dir=data_dir / "train", stmf_data_path=DATA_ROOT / STMF_FILENAME, transform=TRAIN_TRANSFORM)
-        dataset_test = model.dataset(data_dir=data_dir / "test", stmf_data_path=DATA_ROOT / STMF_FILENAME, transform=TEST_TRANSFORM)
-        
-        train_data_loader = DataLoader(dataset_train, batch_size=config.batch_size, shuffle=True, num_workers=4)
-        test_data_loader = DataLoader(dataset_test, batch_size=500, shuffle=False, num_workers=1)
-
-        # Training Loop
-        best_vloss = float('inf')
-        for epoch in range(config.epochs):
-            print(f'EPOCH {epoch + 1}:')
-            model.train(True)
-            avg_loss = train_one_epoch(loss_fn, model, train_data_loader, optimizer)
-            
-            rmse = avg_loss ** 0.5
-            #log_rmse = log10(rmse)
-
-            running_test_loss = 0.
-            model.eval()
-            with torch.no_grad():
-                for i, vdata in enumerate(test_data_loader):
-                    spectrogram, target = vdata["spectrogram"].to(DEVICE), vdata["target"].to(DEVICE)
-                    test_outputs = model(spectrogram)
-                    test_loss = loss_fn(test_outputs.squeeze(), target)
-                    running_test_loss += test_loss.item()
-
-            avg_test_loss = running_test_loss / (i + 1)
-            test_rmse = avg_test_loss ** 0.5
-            #log_test_rmse = torch.log10(test_rmse)
-
-            print(f'LOSS train {avg_loss} ; LOSS test {avg_test_loss}')
-            
-            # log metrics to wandb
-            wandb.log({
-                "loss": avg_loss,
-                "rmse": rmse,
-                #"log_rmse": log_rmse,
-                "test_loss": avg_test_loss,
-                "test_rmse": test_rmse,
-                #"log_test_rmse": log_test_rmse,
-            })
-
-            # Track best performance, and save the model's state
-            if avg_test_loss < best_vloss:
-                best_vloss = avg_test_loss
-                model_path = MODEL_DIR / f"model_{model.__class__.__name__}_{wandb.run.name}"
-                torch.save(model.state_dict(), model_path)
-
-    # Ensure that each run is properly finished
-    #wandb.finish()
-
-# WandB Sweep Configuration
-sweep_config = {
-    'method': 'grid',  # Specifies grid search to try all configurations
-    
-    'metric': 
-        {'name': 'test_rmse', 'goal': 'minimize'}
-    ,
-    
-    'parameters': {
-        'conv_dropout': {
-            'values': [0.1, 0.3, 0.5] #[0.1, 0.3, 0.5]
-        },
-        'linear_dropout': {
-            'values': [0.1, 0.3, 0.5] #[0.1, 0.3, 0.5]
-        },
-        'kernel_size': {
-            'values': ['3x3', '5x5', '7x7', '1x3', '3x1', '3x5', '5x3', '3x7', '7x3']
-        },
-        'hidden_units': {
-            'values': [64, 128, 256] #[64, 128, 256]
-        },
-        'learning_rate': {
-            'values': [1e-3, 1e-4, 1e-5, 1e-6]
-        },
-        'epochs': {
-            'values': [10, 20, 50] #[10, 20, 50]
-        },
-        'batch_size': {
-            'values': [16, 32, 64] #[16, 32, 64]
-        },
-        'num_conv_layers':{
-            'values': [1,2,3]
-        },
-        'num_fc_layers':{
-            'values': [1,2,3] #[1,2,3]
-        },
-        'stride': {
-            'values': [1,2,3] #[1,2,3]
-        },
-        'padding': {
-            'values': [1,2,3] #[1,2,3]
-        },
-        'pooling_size':{
-            'values': [1,2,4] #[1,2,4]
-        },
-        'out_channels':{
-            'values': [16,32] #[16,32] # at least 2^max_num_conv layers
-        },
-        'activation_fn': {
-            'values': ['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid', 'Swish', 'Mish']
-        },
-        'weights_init': {
-            'values': ['Uniform', 'Kaiming_uniform', 'Kaiming_normal', 'Xavier_uniform', 'Xavier_normal']
-        },
-
-        # Parameter for batchnorm on cnn_layers
-        'use_cnn_batchnorm': {
-            'values': [True, False] #[True, False]
-        },
-
-        # Parameter for batchnorm on fc_layers
-        'use_fc_batchnorm': {
-            'values': [True, False] #[True, False]
-        },
-
-        # Parameters for optimizer
-        'optimizer': {
-            'values': ['SGD', 'Adam', 'AdamW', 'AdaGrad'] #['SGD', 'Adam', 'AdamW', 'AdaGrad']
-        },
-        'weight_decay': {
-            'values': [0, 1e-5, 1e-4, 1e-3, 1e-2] #[0, 1e-5, 1e-4, 1e-3, 1e-2]        
-        },
-        'momentum': {
-            'values': [0.7] #[0.7, 0.8, 0.9]        
-        }
-    }
-}
-
 if __name__ == "__main__":
-    # Initialize the sweep in WandB
-    sweep_id = wandb.sweep(sweep_config, project="Deep Learning Project Group 97")
-    wandb.agent(sweep_id, train)
+    print(f"Using {DEVICE} device")
+
+    # DATA SET SETUP
+    dataset_name = make_dataset_name(nfft=NFFT, ts_crop_width=TS_CROPTWIDTH, vr_crop_width=VR_CROPTWIDTH)
+    data_dir = DATA_ROOT / dataset_name
+
+    TRAIN_TRANSFORM = transforms.Compose(
+        [LoadSpectrogram(root_dir=data_dir / "train"),
+        Prepro(),
+        ToTensor(),
+        InterpolateSpectrogram()]
+    )
+    TEST_TRANSFORM = transforms.Compose(
+        [LoadSpectrogram(root_dir=data_dir / "test"),
+        Prepro(),
+        ToTensor(),
+        InterpolateSpectrogram()]
+    )
+    dataset_train = MODEL.dataset(data_dir= data_dir / "train",
+                           stmf_data_path = DATA_ROOT / STMF_FILENAME,
+                           transform=TRAIN_TRANSFORM)
+
+    dataset_test = MODEL.dataset(data_dir= data_dir / "test",
+                           stmf_data_path = DATA_ROOT / STMF_FILENAME,
+                           transform=TEST_TRANSFORM)
+    
+    train_data_loader = DataLoader(dataset_train, 
+                                   batch_size=BATCH_SIZE,
+                                   shuffle=True,
+                                   num_workers=NUM_WORKERS)
+    test_data_loader = DataLoader(dataset_test,
+                                  batch_size=500,
+                                  shuffle=False,
+                                  num_workers=1)
+    
+
+
+    if LOAD_MODEL_FNAME is not None:
+        model = MODEL().to(DEVICE)
+        model.load_state_dict(torch.load(MODEL_DIR / LOAD_MODEL_FNAME))
+        model.eval()
+    else:
+        model = MODEL().to(DEVICE)
+        model.apply(weights_init_uniform_rule)
+
+    optimizer = OPTIMIZER(model.parameters(), lr=LEARNING_RATE, momentum=0.9)
+    
+    
+    # Set up wandb for reporting
+    wandb.init(
+        project=f"02456_group_{GROUP_NUMBER}",
+        config={
+            "learning_rate": LEARNING_RATE,
+            "architecture": MODEL.__name__,
+            "dataset": MODEL.dataset.__name__,
+            "epochs": EPOCHS,
+            "batch_size": BATCH_SIZE,
+            "transform": "|".join([str(tr).split(".")[1].split(" ")[0] for tr in dataset_train.transform.transforms]),
+            "optimizer": OPTIMIZER.__name__,
+            "loss_fn": model.loss_fn.__name__,
+            "nfft": NFFT
+        }
+    )
+
+    # Define model output to save weights during training
+    MODEL_DIR.mkdir(exist_ok=True)
+    model_name = f"model_{MODEL.__name__}_{wandb.run.name}"
+    model_path = MODEL_DIR / model_name
+
+
+    ## TRAINING LOOP
+    epoch_number = 0
+    best_vloss = 1_000_000.
+
+    # import pdb; pdb.set_trace()
+
+    for epoch in range(EPOCHS):
+        print('EPOCH {}:'.format(epoch_number + 1))
+
+        # Make sure gradient tracking is on
+        model.train(True)
+
+        # Do a pass over the training data and get the average training MSE loss
+        avg_loss = train_one_epoch(MODEL.loss_fn, model, train_data_loader)
+        
+        # Calculate the root mean squared error: This gives
+        # us the opportunity to evaluate the loss as an error
+        # in natural units of the ball velocity (m/s)
+        rmse = avg_loss**(1/2)
+
+        # Take the log as well for easier tracking of the
+        # development of the loss.
+        log_rmse = log10(rmse)
+
+        # Reset test loss
+        running_test_loss = 0.
+
+        # Set the model to evaluation mode
+        model.eval()
+
+        # Disable gradient computation and evaluate the test data
+        with torch.no_grad():
+            for i, vdata in enumerate(test_data_loader):
+                # Get data and targets
+                spectrogram, target = vdata["spectrogram"].to(DEVICE), vdata["target"].to(DEVICE)
+                
+                # Get model outputs
+                test_outputs = model(spectrogram)
+
+                # Calculate the loss
+                test_loss = MODEL.loss_fn(test_outputs.squeeze(), target)
+
+                # Add loss to runnings loss
+                running_test_loss += test_loss
+
+        # Calculate average test loss
+        avg_test_loss = running_test_loss / (i + 1)
+
+        # Calculate the RSE for the training predictions
+        test_rmse = avg_test_loss**(1/2)
+
+        # Take the log as well for visualisation
+        log_test_rmse = torch.log10(test_rmse)
+
+        print('LOSS train {} ; LOSS test {}'.format(avg_loss, avg_test_loss))
+        
+        # log metrics to wandb
+        wandb.log({
+            "loss": avg_loss,
+            "rmse": rmse,
+            "log_rmse": log_rmse,
+            "test_loss": avg_test_loss,
+            "Validation_rmse": test_rmse,
+            "log_test_rmse": log_test_rmse,
+        })
+
+        # Track best performance, and save the model's state
+        if avg_test_loss < best_vloss:
+            best_vloss = avg_test_loss
+            torch.save(model.state_dict(), model_path)
+
+        epoch_number += 1
+
+    wandb.finish()
+
+
+
+

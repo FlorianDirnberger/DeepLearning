@@ -1,6 +1,8 @@
 # Ignore virtual environment
 /scripts/02456_grp_97_venv/
 
+#ignore all images
+*.png
 
 # Ignore log files
 *.log

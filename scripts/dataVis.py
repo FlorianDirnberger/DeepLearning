@@ -11,8 +11,9 @@ import math
 
 
 # Constants
-TS_CROPTWIDTH = (-150, 200)  # Time crop width in milliseconds
-VR_CROPTWIDTH = (-60, 15)    # Radial velocity crop width in m/s
+TS_CROPTWIDTH = (-140, 5)  # Time crop width in milliseconds
+VR_CROPTWIDTH = (-60, 0)    # Radial velocity crop width in m/s
+
 def draw_contour_orientation(image, contour, moment, color=(255, 0, 0), thickness=2):
     """Draw the principal axis of the contour based on its orientation.
 
@@ -50,9 +51,9 @@ def draw_contour_orientation(image, contour, moment, color=(255, 0, 0), thicknes
     # Draw the line on the image
     cv2.line(image, (x1, y1), (x2, y2), color, thickness)
 
-# Main function for debugging contour orientations
 def visualize_contour_orientations(canny_edges, gradient_magnitude_thresholded):
     """Visualize the orientation of contours, filtering out small contours and checking for north orientation.
+       Also highlights the center of mass of the leftmost contour.
 
     Args:
         canny_edges (np.ndarray): Edge-detected image.
@@ -74,12 +75,30 @@ def visualize_contour_orientations(canny_edges, gradient_magnitude_thresholded):
     # Create a copy of the image to draw debug visuals
     debug_image = cv2.cvtColor((gradient_magnitude_thresholded * 255).astype(np.uint8), cv2.COLOR_GRAY2BGR)
 
+    # Variable to store the leftmost contour and its centroid
+    leftmost_centroid = None
+    leftmost_x = float('inf')
+
     # Process contours and draw orientations if they are "north"
     for contour in filtered_contours:
         moment = cv2.moments(contour)
         if moment['m00'] != 0:  # Avoid division by zero for empty contours
             if is_contour_north(moment, tolerance_degrees=30):  # Check if contour is "north"
+                # Draw the contour orientation
                 draw_contour_orientation(debug_image, contour, moment, color=(0, 255, 0), thickness=1)
+
+                # Compute centroid
+                cx = int(moment['m10'] / moment['m00'])
+                cy = int(moment['m01'] / moment['m00'])
+
+                # Update leftmost contour
+                if cx < leftmost_x:
+                    leftmost_x = cx
+                    leftmost_centroid = (cx, cy)
+
+    # Draw the center of mass of the leftmost contour
+    if leftmost_centroid:
+        cv2.circle(debug_image, leftmost_centroid, radius=5, color=(0, 0, 255), thickness=-1)
 
     return debug_image
 
@@ -110,28 +129,8 @@ def is_contour_north(moment, tolerance_degrees=30):
     angle_degrees = math.degrees(theta)
     #print(angle_degrees)
 
-    # Check if the angle aligns with the y-axis (near 90° or -90°)
+    # Check if the angle aligns with the y-axis (near 90°)
     return abs(angle_degrees) >= tolerance_degrees
-
-def process_contours(canny_edges):
-    # Find contours
-    contours, _ = cv2.findContours(canny_edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    # Compute the largest contour area
-    largest_contour_area = max(cv2.contourArea(contour) for contour in contours)
-    area_threshold = largest_contour_area * 0.3
-
-    # Filter contours by area
-    Aera_filtered_contours = [contour for contour in contours if cv2.contourArea(contour) >= area_threshold]
-    # Filter contours based on orientation
-    filtered_contours = []
-    for contour in contours:
-        moment = cv2.moments(Aera_filtered_contours)
-        if moment['m00'] != 0:  # Avoid division by zero for empty contours
-            if is_contour_north(moment, tolerance_degrees=80):  # Adjust tolerance as needed
-                filtered_contours.append(contour)
-
-    return filtered_contours
-
 
 
 def _to_tensor(spectrogram):
@@ -185,8 +184,10 @@ def plot_spectrogram_with_annotations(
     # Compute the gradient magnitude
     gradient_magnitude = np.sqrt(sobelx**2)
 
+    blurred_gradient = cv2.GaussianBlur(gradient_magnitude, (9, 9), sigmaX=1)
+
     # Normalize the result to the range [0, 1] for visualization
-    gradient_magnitude_norm = cv2.normalize(gradient_magnitude, None, 0, 1, cv2.NORM_MINMAX)
+    gradient_magnitude_norm = cv2.normalize(blurred_gradient, None, 0, 1, cv2.NORM_MINMAX)
 
     # Flatten the normalized gradient for easier percentile computation
     gradient_flat = gradient_magnitude_norm.flatten()
@@ -208,7 +209,7 @@ def plot_spectrogram_with_annotations(
     gradient_magnitude_thresholded = np.where(gradient_magnitude_norm >= adaptive_threshold, gradient_magnitude_norm, 0)
 
     # Apply Canny edge detection
-    canny_edges = cv2.Canny((gradient_magnitude_thresholded * 255).astype(np.uint8), 200, 255)
+    canny_edges = cv2.Canny((gradient_magnitude_thresholded * 255).astype(np.uint8), 50, 255)
 
     # Visualize contour orientations
     debug_image = visualize_contour_orientations(canny_edges, gradient_magnitude_thresholded)
@@ -285,13 +286,16 @@ def plot_spectrogram_with_annotations(
 
 # Main execution
 if __name__ == "__main__":
+
+    stmf_data = Path(f"/dtu-compute/02456-p4-e24/data/stmf_data_3.csv") 
+
     # Define start and end observation numbers
     start_obs_no = 136188  # Replace with your starting observation number
     end_obs_no = 137019    # Replace with your ending observation number
 
     # Load targets CSV to get the true radial velocities
     targets_csv_path = Path(__file__).parent.parent.parent / "data" / "stmf_data_3.csv"
-    targets = pd.read_csv(targets_csv_path)
+    targets = pd.read_csv(stmf_data)
 
     # Set the observation numbers as the index if not already
     if 'ObsNo' in targets.columns:

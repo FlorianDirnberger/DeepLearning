@@ -1,0 +1,32 @@
+{
+  "os": "Linux-6.1.112-1.el9.elrepo.x86_64-x86_64-with-glibc2.34",
+  "python": "3.9.18",
+  "startedAt": "2024-11-26T17:00:33.682944Z",
+  "program": "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts/modular_train_test.py",
+  "codePath": "scripts/modular_train_test.py",
+  "git": {
+    "remote": "https://github.com/FlorianDirnberger/DeepLearning97",
+    "commit": "0503d46591b525c01c59a8c70b4079cd7eadc4a5"
+  },
+  "email": "s232735@dtu.dk",
+  "root": "/zhome/cf/5/202847/my_project_dir/DeepLearning97/scripts",
+  "host": "gbarlogin1",
+  "username": "s232735",
+  "executable": "/zhome/cf/5/202847/my_project_dir/02456_grp_99_venv/bin/python",
+  "codePathLocal": "modular_train_test.py",
+  "cpu_count": 64,
+  "cpu_count_logical": 64,
+  "disk": {
+    "/": {
+      "total": "76817485824",
+      "used": "7472472064"
+    }
+  },
+  "memory": {
+    "total": "1081357918208"
+  },
+  "cpu": {
+    "count": 64,
+    "countLogical": 64
+  }
+}

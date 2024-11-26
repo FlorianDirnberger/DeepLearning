@@ -25,3 +25,8 @@
 *.ssh
 .ssh/key
 .ssh/key.pub
+
+#ignore for files inside scripts
+/scripts/wand
+/scripts/_pycache
+

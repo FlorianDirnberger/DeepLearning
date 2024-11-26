@@ -30,7 +30,7 @@ DEVICE = (
     if torch.backends.mps.is_available()
     else "cpu"
 )
-#DEVICE = "cpu"
+# DEVICE = "cpu"
 # Load environment variables from .env file
 load_dotenv()
 
@@ -59,55 +59,6 @@ VR_CROPTWIDTH = (-60, 15)
 
 # Create the directory if it doesn't exist
 #save_dir.mkdir(parents=True, exist_ok=True)
-
-def plot_spectrogram_with_annotations(
-    spectrogram: Union[Tensor, np.ndarray],
-    spectrogram_channel: int = 0,
-    save_path: Optional[Union[str, Path]] = None
-) -> None:
-    """Plot spectrogram for the specified channel.
-
-    Args:
-        spectrogram (Union[Tensor, np.ndarray]): Input spectrogram to plot.
-        spectrogram_channel (int, optional): Spectrogram channel to plot. Defaults to 0.
-        save_path (Optional[Union[str, Path]], optional): Path to save the plot image. If None, displays the plot.
-    """
-    # If the spectrogram is a tensor, convert it to numpy array
-    if isinstance(spectrogram, Tensor):
-        spectrogram = spectrogram.cpu().numpy()
-    elif not isinstance(spectrogram, np.ndarray):
-        raise TypeError("spectrogram must be a Tensor or ndarray")
-
-    # Select the specified channel
-    spectrogram_channel_data = spectrogram[spectrogram_channel, :, :]
-
-    # Use the spectrogram data for plotting
-    spectrogram_to_plot = spectrogram_channel_data
-
-    # Create the plot
-    plt.figure(figsize=(10, 6))
-    plt.imshow(
-        spectrogram_to_plot,
-        aspect="auto",
-        origin="lower",
-        cmap="jet"
-    )
-    plt.colorbar(label='Amplitude')
-    plt.xlabel("Time [s]")
-    plt.ylabel("Radial Velocity [m/s]")
-    plt.title(f"Spectrogram - Channel {spectrogram_channel}")
-
-    # Save or display the plot
-    if save_path:
-        save_path = Path(save_path).expanduser()
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-        plt.savefig(save_path)
-        plt.close()
-        print(f"Plot saved to {save_path}")
-    else:
-        plt.show()
-
-
 
 def train_one_epoch(loss_fn, model, train_data_loader):
     running_loss = 0.

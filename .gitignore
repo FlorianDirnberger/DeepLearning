@@ -27,6 +27,6 @@
 .ssh/key.pub
 
 #ignore for files inside scripts
-/scripts/wand
+/scripts/wandb
 /scripts/_pycache
 

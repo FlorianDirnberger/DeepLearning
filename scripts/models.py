@@ -88,3 +88,9 @@ def weights_init_uniform_rule(m):
         y = 1.0/n**.5
         m.weight.data.uniform_(-y, y)
         m.bias.data.fill_(0)
+        
+def weights_init_kaiming(m):
+    if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
+        nn.init.kaiming_uniform_(m.weight, nonlinearity='relu')
+        if m.bias is not None:
+            nn.init.zeros_(m.bias)

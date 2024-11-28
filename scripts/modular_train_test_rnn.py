@@ -8,7 +8,7 @@ import os
 import pickle
 import pandas as pd
 import numpy as np
-from models import RNN, weights_init_uniform_rule
+from models import RNN, weights_init_uniform_rule, weights_init_kaiming
 
 # Constants and Configurations
 GROUP_NUMBER = 97
@@ -224,39 +224,23 @@ sweep_config = {
     'metric': {'name': 'test_rmse', 'goal': 'minimize'},
     'parameters': {
         'mode': {
-            'values': ["GRU", "RNN", "LTSM"]},
+            'values': ["GRU"]},
         'hidden_size': {
-            'values': [32, 64]},
+            'values': [256]},
         'learning_rate': {
-            'values': [0.0001, ]},
+            'values': [0.0001]},
         'num_layers': {
-            'values': [1, 3, 5]},
+            'values': [5]},
         'dropout': {  # Corrected from 'droput' to 'dropout'
-            'values': [0.0, 0.2]},
+            'values': [0.0,]},
         'epochs': {
             'values': [10]},
         'batch_size': {  # Ensure this matches the key you use in the training code
-            'values': [32, 16]
+            'values': [64]
         }
     }
 }
 
-
-def weights_init_uniform_rule(m):
-    if isinstance(m, nn.Linear):  # Handle Linear layers
-        nn.init.uniform_(m.weight, -0.1, 0.1)
-        if m.bias is not None:
-            nn.init.uniform_(m.bias, -0.1, 0.1)
-    elif isinstance(m, nn.Conv2d):  # Handle Conv2D layers
-        nn.init.uniform_(m.weight, -0.1, 0.1)
-        if m.bias is not None:
-            nn.init.uniform_(m.bias, -0.1, 0.1)
-    elif isinstance(m, nn.LSTM):  # Handle LSTM layers
-        for name, param in m.named_parameters():
-            if "weight" in name:  # Initialize weights
-                nn.init.uniform_(param, -0.1, 0.1)
-            elif "bias" in name:  # Initialize biases
-                nn.init.uniform_(param, -0.1, 0.1)
    
 
 if __name__ == "__main__":

@@ -139,6 +139,7 @@ def train_one_epoch(loss_fn, model, data_loader, optimizer):
         outputs = model(timeseries)
         loss = loss_fn(outputs.squeeze(), labels)
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimizer.step()
 
         running_loss += loss.item()
@@ -188,7 +189,8 @@ def train():
             output_size=1,
         ).to(DEVICE)
 
-        model.apply(weights_init_uniform_rule)
+        #model.apply(weights_init_uniform_rule)
+        model.apply(weights_init_kaiming)
 
         # Set optimizer and loss
         optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=0.9)
@@ -224,19 +226,19 @@ sweep_config = {
     'metric': {'name': 'test_rmse', 'goal': 'minimize'},
     'parameters': {
         'mode': {
-            'values': ["GRU"]},
+            'values': ["RNN", "GRU", "LSTM"]},
         'hidden_size': {
             'values': [256]},
         'learning_rate': {
-            'values': [0.0001]},
+            'values': [0.0001, 0.001]},
         'num_layers': {
-            'values': [5]},
+            'values': [2,5,8]},
         'dropout': {  # Corrected from 'droput' to 'dropout'
-            'values': [0.0,]},
+            'values': [0, 0.3]},
         'epochs': {
-            'values': [10]},
+            'values': [50]},
         'batch_size': {  # Ensure this matches the key you use in the training code
-            'values': [64]
+            'values': [32]
         }
     }
 }

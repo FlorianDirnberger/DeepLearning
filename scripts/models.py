@@ -43,14 +43,17 @@ class RNN(nn.Module):
             raise ValueError("Undefined mode, enter 'RNN', 'GRU' or 'LSTM'")
         
         # BatchNorm on the hidden size
-        self.bn = nn.BatchNorm1d(hidden_size)
+        self.bn = nn.LayerNorm(hidden_size)
         
         # Fully connected layers
         self.fc = nn.Sequential(
             nn.Linear(hidden_size, 128),
             nn.ReLU(),
-            nn.Dropout(dropout),  # Use dropout here
-            nn.Linear(128, output_size)
+            nn.Dropout(dropout),
+            nn.Linear(128,64),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(64, output_size)
         )
 
     def forward(self, x):

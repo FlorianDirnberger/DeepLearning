@@ -18,4 +18,4 @@ echo "Running script..."
 module load cuda/11.8
 module load python3/3.10.13
 source ~02456_grp_97_venv/bin/activate # Update this path to reflect your venv name
-python3 ~zhome/9e/8/212358/Documents/DeepLearning/scripts/modular_train_test.py > log/modular_train_test$(date +"%d-%m-%y")_$(date +'%H:%M:%S').log
+python3 ~zhome/9e/8/212358/Documents/DeepLearning/scripts/modular_train_test_rnn.py > log/modular_train_test_rnn$(date +"%d-%m-%y")_$(date +'%H:%M:%S').log

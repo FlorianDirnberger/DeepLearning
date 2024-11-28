@@ -224,19 +224,19 @@ sweep_config = {
     'metric': {'name': 'test_rmse', 'goal': 'minimize'},
     'parameters': {
         'mode': {
-            'values': ["GRU"]},
+            'values': ["GRU", "RNN", "LTSM"]},
         'hidden_size': {
-            'values': [32]},
+            'values': [32, 64]},
         'learning_rate': {
-            'values': [0.001]},
+            'values': [0.0001, ]},
         'num_layers': {
-            'values': [1]},
+            'values': [1, 3, 5]},
         'dropout': {  # Corrected from 'droput' to 'dropout'
-            'values': [0.0]},
+            'values': [0.0, 0.2]},
         'epochs': {
-            'values': [100]},
+            'values': [10]},
         'batch_size': {  # Ensure this matches the key you use in the training code
-            'values': [32]
+            'values': [32, 16]
         }
     }
 }

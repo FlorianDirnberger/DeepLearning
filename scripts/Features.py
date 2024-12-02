@@ -112,8 +112,6 @@ def extract_spectrogram_features(spectrogram_np):
     feature_vector = [float(x) for x in feature_vector]
     return feature_vector
 
-
-
 class ProcessSpectrogram:
     """
     Wrapper for process_spectrogram to use in a transformation pipeline.
@@ -121,8 +119,7 @@ class ProcessSpectrogram:
     def __call__(self, spectrogram_tensor):
         # Call the existing function and return its output
         return process_spectrogram(spectrogram_tensor)
-    
-    
+        
 def process_spectrogram(spectrogram_tensor):
     """
     Process a spectrogram with multiple channels (H x W x C) and extract features from

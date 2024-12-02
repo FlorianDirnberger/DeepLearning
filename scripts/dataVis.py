@@ -11,8 +11,8 @@ import math
 
 
 # Constants
-TS_CROPTWIDTH = (-140, 5)  # Time crop width in milliseconds
-VR_CROPTWIDTH = (-60, 0)    # Radial velocity crop width in m/s
+TS_CROPTWIDTH = (-150, 200)
+VR_CROPTWIDTH = (-60, 15)
 
 def draw_contour_orientation(image, contour, moment, color=(255, 0, 0), thickness=2):
     """Draw the principal axis of the contour based on its orientation.
@@ -179,62 +179,23 @@ def plot_spectrogram_with_annotations(
     if spectrogram_np.dtype != np.float64:
         spectrogram_np = spectrogram_np.astype(np.float64)	
    
-    sobelx = cv2.Sobel(spectrogram_np, cv2.CV_64F, dx=1, dy=0, ksize=31)
-    
+    sobelx = cv2.Sobel(spectrogram_np, cv2.CV_64F, dx=1, dy=0, ksize=21)
     # Compute the gradient magnitude
     gradient_magnitude = np.sqrt(sobelx**2)
 
-    blurred_gradient = cv2.GaussianBlur(gradient_magnitude, (9, 9), sigmaX=1)
+    pectrogram_normalized = cv2.normalize(gradient_magnitude, None, 0, 1, cv2.NORM_MINMAX)
 
-    # Normalize the result to the range [0, 1] for visualization
-    gradient_magnitude_norm = cv2.normalize(blurred_gradient, None, 0, 1, cv2.NORM_MINMAX)
-
-    # Flatten the normalized gradient for easier percentile computation
-    gradient_flat = gradient_magnitude_norm.flatten()
-
-    # Find the 90th percentile (top 10% threshold)
-    top_10_percent_threshold = np.percentile(gradient_flat, 95)
-
-    # Get values in the top 10% range
-    top_10_percent_values = gradient_flat[gradient_flat >= top_10_percent_threshold]
-
-    # Compute the mean and standard deviation of the top 10% values
-    mean_top_10 = np.mean(top_10_percent_values)
-    std_top_10 = np.std(top_10_percent_values)
-
-    # Set the threshold to one standard deviation above the mean
-    adaptive_threshold = mean_top_10 + std_top_10
-
-    # Apply the threshold to create the thresholded gradient
-    gradient_magnitude_thresholded = np.where(gradient_magnitude_norm >= adaptive_threshold, gradient_magnitude_norm, 0)
-
-    # Apply Canny edge detection
-    canny_edges = cv2.Canny((gradient_magnitude_thresholded * 255).astype(np.uint8), 50, 255)
-
-    # Visualize contour orientations
-    debug_image = visualize_contour_orientations(canny_edges, gradient_magnitude_thresholded)
-
-
-    
-
-    #filtered_contours = process_contours(canny_edges)
-
-    # Draw filtered contours
-    gradient_with_contours = cv2.cvtColor((gradient_magnitude_thresholded * 255).astype(np.uint8), cv2.COLOR_GRAY2BGR)
-    #cv2.drawContours(gradient_with_contours, filtered_contours, -1, (0, 0, 255), 1)
-
-    # Use the processed spectrogram for plotting
-    spectrogram_to_plot = debug_image
-
+  
 
     # Set color scale limits based on processed data
+    # vmin = 0
+    # vmax = 1
     vmin = 0
     vmax = 1
-
     # Create the plot
     _, ax = plt.subplots(1, 1, figsize=(10, 6))
     img = ax.imshow(
-        spectrogram_to_plot,
+        pectrogram_normalized,
         aspect="auto",
         extent=[
             TS_CROPTWIDTH[0] / 1000, TS_CROPTWIDTH[1] / 1000,
@@ -268,7 +229,7 @@ def plot_spectrogram_with_annotations(
 
     # Add colorbar
     cbar = plt.colorbar(img, ax=ax)
-    cbar.set_label('Sobel Gradient')
+    cbar.set_label('Power')
 
     # Save or display the plot
     if save_path:
@@ -291,7 +252,7 @@ if __name__ == "__main__":
 
     # Define start and end observation numbers
     start_obs_no = 136188  # Replace with your starting observation number
-    end_obs_no = 137019    # Replace with your ending observation number
+    end_obs_no = 137000    # Replace with your ending observation number
 
     # Load targets CSV to get the true radial velocities
     targets_csv_path = Path(__file__).parent.parent.parent / "data" / "stmf_data_3.csv"
@@ -340,7 +301,7 @@ if __name__ == "__main__":
             estimated_vr = None  # Replace with your estimated radial velocity if available
 
             # Save path for the plot
-            save_path = save_dir / f"spectrogram_filterd_{obs_no}.png"
+            save_path = save_dir / f"spectrogram_filterd_sobel_{obs_no}.png"
 
             # Call the plotting function
             plot_spectrogram_with_annotations(

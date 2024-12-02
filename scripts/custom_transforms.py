@@ -38,17 +38,7 @@ class Prepro(object): # first 4 channels are power and last two are phase
             sobelx = np.sqrt(sobelx**2)
 
             # Replace the channel data with the Sobel filtered data
-            spectrogram_processed[:, :, ch] = sobelx
-
-        # Optional: Normalize the processed spectrogram channels if needed
-        # You can normalize each channel to have zero mean and unit variance
-        for ch in self.power_channels:
-            channel_data = spectrogram_processed[:, :, ch]
-            mean = np.mean(channel_data)
-            std = np.std(channel_data)
-            if std == 0:
-                std = 1.0  # Prevent division by zero
-            spectrogram_processed[:, :, ch] = (channel_data - mean) / std
+            spectrogram_processed[:, :, ch] = cv2.normalize(sobelx, None, 0, 1, cv2.NORM_MINMAX)
 
         # Return the processed spectrogram
         return spectrogram_processed

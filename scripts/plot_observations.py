@@ -118,7 +118,7 @@ def plot_spectrogram_with_annotations(
 if __name__ == "__main__":
     # Define start and end observation numbers
     start_obs_no = 136188  # Replace with your starting observation number
-    end_obs_no = 136188    # Replace with your ending observation number
+    end_obs_no = 137000    # Replace with your ending observation number
 
     # Load targets CSV to get the true radial velocities
     stmf_data = Path(f"/dtu-compute/02456-p4-e24/data/stmf_data_3.csv")

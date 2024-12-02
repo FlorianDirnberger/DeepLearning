@@ -7,6 +7,10 @@
 # Ignore log files
 *.log
 
+# paychace
+*.pyc
+
+
 # Ignore temporary files
 *.tmp
 

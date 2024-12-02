@@ -60,14 +60,14 @@ class CNN_97(nn.Module):
 
         # Define dynamic fully connected layers
         fc_layers = []
-        for i in range(num_fc_layers - 1):
+        for i in range(num_fc_layers - 1): #added halfing of hidden units each layer
             fc_layers.append(nn.Linear(input_dim, hidden_units))
             if use_fc_batchnorm:  # Add BatchNorm1d if enabled
                 fc_layers.append(nn.BatchNorm1d(hidden_units))
             fc_layers.append(activation())
             fc_layers.append(nn.Dropout(linear_dropout))
             input_dim = hidden_units  # Update for the next layer
-        
+            hidden_units = hidden_units // 2 # halve hidden units
         # Final output layer with a single output feature
         fc_layers.append(nn.Linear(input_dim, 1))
         self.fc_layers = nn.Sequential(*fc_layers)

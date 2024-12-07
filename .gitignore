@@ -1,6 +1,14 @@
 # Ignore virtual environment
 /scripts/02456_grp_97_venv/
 
+# Ignore error files
+*.err
+
+# Ignore output files
+*.out
+
+# Ignore pychache folder
+scripts/__pychache__/
 
 # Ignore log files
 *.log

@@ -3,6 +3,19 @@ import torch
 
 from loss import mse_loss
 from datasets import SpectrogramDataset
+
+class SpatialAttention(nn.Module):
+    def __init__(self, in_channels):
+        super(SpatialAttention, self).__init__()
+        # 1x1 convolution to get a spatial attention map
+        self.attention_conv = nn.Conv2d(in_channels, 1, kernel_size=1)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        # Generate the attention map
+        attention_map = self.attention_conv(x)
+        attention_map = self.sigmoid(attention_map)  # Apply sigmoid to get attention weights
+        return x * attention_map  # Apply attention to the input feature map
     
 
 class CNN_97(nn.Module):
@@ -43,6 +56,10 @@ class CNN_97(nn.Module):
             conv_layers.append(activation())
             conv_layers.append(nn.MaxPool2d(kernel_size=pooling_size))
             conv_layers.append(nn.Dropout(conv_dropout))
+
+            # Add Spatial Attention after each convolution block
+            conv_layers.append(SpatialAttention(out_channels))
+            
             in_channels = out_channels  # Update input channels for the next layer
             out_channels *= 2  # Double output channels for each subsequent layer
             

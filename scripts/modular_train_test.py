@@ -24,7 +24,7 @@ STMF_FILENAME = "stmf_data_3.csv"
 NFFT = 512
 TS_CROPTWIDTH = (-150, 200)
 VR_CROPTWIDTH = (-60, 15)
-#DEVICE = "cpu"
+# DEVICE = "cpu"
 DEVICE = (
     "cuda"
     if torch.cuda.is_available()
@@ -93,9 +93,10 @@ def train():
             '3x5': (3, 5), 
             '5x3': (5, 3), 
             '3x7': (3, 7), 
-            '7x3': (7, 3)
+            '7x3': (7, 3),
+            '5x7': (5, 7),
+            '7x5': (7, 5)
         }
-
         
 
         # Initialize model with the current WandB configuration
@@ -115,6 +116,11 @@ def train():
             use_cnn_batchnorm = config.use_cnn_batchnorm 
         ).to(DEVICE)
 
+        # Total model parameter, tracked in wandb
+        total_params = sum(param.numel() for param in model.parameters())
+        print(f"Total parameters: {total_params}")
+        wandb.log({"total_parameters":total_params})
+        
         # Weight initializations depending on activation function
         weights_init_map = {
             'Uniform': lambda m: weights_init_uniform_rule(m),
@@ -282,52 +288,53 @@ sweep_config = {
     'metric': 
         {'name': 'validation_rmse', 'goal': 'minimize'}
     ,
+    # 'count': 1000,
     
     'parameters': {
         'conv_dropout': {
-            'values': [0, 0.3] #[0.1, 0.3, 0.5]
+            'values': [0.4] #[0, 0.1, 0.2, 0.3, 0.4, 0.5] #[0.1, 0.3, 0.5]
         },
         'linear_dropout': {
-            'values': [0] #[0.1, 0.3, 0.5]
+            'values': [0.3] #[0, 0.1, 0.2, 0.3, 0.4, 0.5] #[0.1, 0.3, 0.5]
         },
         'kernel_size': {
-            'values': ['3x3']
+            'values': ['7x7'] #['3x3', '5x5', '7x7', '3x5', '5x3', '3x7', '7x3', '5x7', '7x5', '1x3', '3x1']
         },
         'hidden_units': {
-            'values': [32, 128] #[64, 128, 256]
+            'values': [64] #[32, 64, 128] #[64, 128, 256]
         },
         'learning_rate': {
-            'values': [1e-4, 1e-5]
+            'values': [1e-4] #[1e-4, 1e-5, 1e-6]
         },
         'epochs': {
-            'values': [50] #[10, 20, 50]
+            'values': [250]
         },
         'batch_size': {
-            'values': [32, 64] #[16, 32, 64]
+            'values': [16] #[16, 32, 64] #[16, 32, 64]
         },
         'num_conv_layers':{
-            'values': [2,3]
+            'values': [3] #[1, 2, 3]
         },
         'num_fc_layers':{
             'values': [2] #[1,2,3]
         },
         'stride': {
-            'values': [1] #[1,2,3]
+            'values': [1] #[1, 2, 3] #[1,2,3]
         },
         'padding': {
-            'values': [1] #[1,2,3]
+            'values': [1] #[0, 1, 2, 3] #[1,2,3]
         },
         'pooling_size':{
-            'values': [2] #[1,2,4]
+            'values': [1] #[1, 2, 4] #[1,2,4]
         },
         'out_channels':{
-            'values': [8,16] #[16,32] # at least 2^max_num_conv layers
+            'values': [16] #[8,16] #[16,32] # at least 2^max_num_conv layers
         },
         'activation_fn': {
-            'values': ['ReLU']
+            'values': ['LeakyReLU'] #['ReLU', 'LeakyReLU', 'Tanh', 'Sigmoid', 'Swish', 'Mish']
         },
         'weights_init': {
-            'values': ['Kaiming_normal']
+            'values': ['Kaiming_uniform'] #['Uniform', 'Kaiming_uniform', 'Kaiming_normal', 'Xavier_uniform', 'Xavier_normal']
         },
 
         # Parameter for batchnorm on cnn_layers
@@ -342,13 +349,13 @@ sweep_config = {
 
         # Parameters for optimizer
         'optimizer': {
-            'values': ['SGD', 'AdamW'] #['SGD', 'Adam', 'AdamW', 'AdaGrad']
+            'values': ['SGD'] #['SGD', 'Adam', 'AdamW', 'AdaGrad'] #['SGD', 'Adam', 'AdamW', 'AdaGrad']
         },
         'weight_decay': {
-            'values': [0, 1e-5] #[0, 1e-5, 1e-4, 1e-3, 1e-2]        
+            'values': [1e-2] #[0, 1e-5, 1e-4, 1e-3, 1e-2] #[0, 1e-5, 1e-4, 1e-3, 1e-2]        
         },
         'momentum': {
-            'values': [0.9] #[0.7, 0.8, 0.9]        
+            'values': [0.8] #[0.7, 0.8, 0.9] #[0.7, 0.8, 0.9]        
         }
     }
 }

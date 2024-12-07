@@ -1,6 +1,6 @@
 #!/bin/sh
 #BSUB -q gpua100
-#BSUB -J Sweep_JARF
+#BSUB -J Sweep_RANDOM_2
 ### number of core
 #BSUB -n 4
 ### specify that all cores should be on the same host
@@ -17,5 +17,5 @@ echo "Running script..."
 
 module load cuda/11.8
 module load python3/3.10.13
-source ~/my_project_dir/02456_grp_99_venv/bin/activate
-python3 ~/my_project_dir/DeepLearning97/scripts/modular_train_test.py > log/modular_train_test$(date +"%d-%m-%y")_$(date +'%H:%M:%S').log
+source ~/dl/p4-velocity/02456_grp_99_venv/bin/activate
+python3 ~/dl/p4-velocity/DeepLearning97/scripts/modular_train_test.py > log/modular_train_test$(date +"%d-%m-%y")_$(date +'%H:%M:%S').log

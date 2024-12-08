@@ -230,9 +230,9 @@ sweep_config = {
         'hidden_size': {
             'values': [256]},
         'learning_rate': {
-            'values': [0.0001, 0.001]},
+            'values': [0.0001]},
         'num_layers': {
-            'values': [2,5,8]},
+            'values': [2]},
         'dropout': {  # Corrected from 'droput' to 'dropout'
             'values': [0, 0.3]},
         'epochs': {

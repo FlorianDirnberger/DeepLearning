@@ -97,3 +97,30 @@ def weights_init_kaiming(m):
         nn.init.kaiming_uniform_(m.weight, nonlinearity='relu')
         if m.bias is not None:
             nn.init.zeros_(m.bias)
+
+
+
+import torch.nn as nn
+import torch
+
+# Define a function to count parameters
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+# Initialize models
+input_size = 8
+hidden_size = 256
+num_layers = 2
+dropout = 0.1
+output_size = 1
+
+# Create model instances
+models = {
+    "RNN": RNN("RNN", input_size, hidden_size, num_layers, dropout, output_size),
+    "GRU": RNN("GRU", input_size, hidden_size, num_layers, dropout, output_size),
+    "LSTM": RNN("LSTM", input_size, hidden_size, num_layers, dropout, output_size),
+}
+
+# Print parameter counts
+for name, model in models.items():
+    print(f"{name} has {count_parameters(model):,} trainable parameters")

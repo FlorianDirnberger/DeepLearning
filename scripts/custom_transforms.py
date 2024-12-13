@@ -20,7 +20,7 @@ class Prepro(object): # first 4 channels are power and last two are phase
     def __init__(self):
         # Define power and phase channels
         self.power_channels = [0, 1, 2, 3]  # Assuming channels 0-3 are power channels
-        
+        self.phase_spectrogram_limits = (-np.pi, np.pi)  # Limits for phase channels
 
     def __call__(self, spectrogram: np.ndarray) -> np.ndarray:
         # Copy the spectrogram to avoid modifying the original data
@@ -39,7 +39,10 @@ class Prepro(object): # first 4 channels are power and last two are phase
 
             # Replace the channel data with the Sobel filtered data
             spectrogram_processed[:, :, ch] = cv2.normalize(sobelx, None, 0, 1, cv2.NORM_MINMAX)
-
+        
+        # Normalize the phase channels (channels 4 and 5)
+        spectrogram_processed[:, :, 4:] -= self.phase_spectrogram_limits[0]
+        spectrogram_processed[:, :, 4:] /= self.phase_spectrogram_limits[1] - self.phase_spectrogram_limits[0]
         # Return the processed spectrogram
         return spectrogram_processed
 

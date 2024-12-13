@@ -26,7 +26,7 @@ DEVICE = (
     if torch.backends.mps.is_available()
     else "cpu"
 )
-# DEVICE = "cpu"
+#DEVICE = "cpu"
 # Load environment variables from .env file
 load_dotenv()
 
@@ -42,6 +42,47 @@ STMF_FILENAME = "stmf_data_3.csv"
 NFFT = 512
 TS_CROPTWIDTH = (-150, 200)
 VR_CROPTWIDTH = (-60, 15)
+
+
+
+
+def is_valid_architecture(input_shape, num_conv_layers, kernel_size, stride, padding, pooling_size):
+    """
+    Validates the compatibility of convolutional and pooling layers with the input dimensions.
+    Args:
+        input_shape (tuple): Shape of the input data (batch_size, channels, height, width).
+        num_conv_layers (int): Number of convolutional layers.
+        kernel_size (tuple): Kernel size for convolution.
+        stride (int): Stride size for convolution.
+        padding (int): Padding size for convolution.
+        pooling_size (int): Pooling size.
+    Returns:
+        bool: True if the architecture is valid, False otherwise.
+    """
+    _, _, height, width = input_shape
+    current_height, current_width = height, width
+
+    for _ in range(num_conv_layers):
+        # Compute height and width after convolution
+        conv_height = (current_height - kernel_size[0] + 2 * padding) // stride + 1
+        conv_width = (current_width - kernel_size[1] + 2 * padding) // stride + 1
+
+        if conv_height <= 0 or conv_width <= 0:
+            return False  # Invalid dimensions after convolution
+
+        current_height, current_width = conv_height, conv_width
+
+        # Compute height and width after pooling
+        pool_height = current_height // pooling_size
+        pool_width = current_width // pooling_size
+
+        if pool_height <= 0 or pool_width <= 0:
+            return False  # Invalid dimensions after pooling
+
+        current_height, current_width = pool_height, pool_width
+
+    return True
+
 
 
 def train_one_epoch(loss_fn, model, train_data_loader, optimizer):
@@ -80,6 +121,7 @@ def train():
         #activation_fn = nn.ReLU
         activation_fn_map = {
             'ReLU': nn.ReLU,
+            'LeakyReLU': nn.LeakyReLU,
         }
         kernel_size_map = {
             '3x3': (3, 3), 
@@ -93,7 +135,20 @@ def train():
             '7x3': (7, 3)
         }
 
-        
+
+         # Validate architecture before initializing the model
+        input_shape = (16, 6, 74, 918)  # [batch_size, channels, height, width]
+        if not is_valid_architecture(
+            input_shape=input_shape,
+            num_conv_layers=config.num_conv_layers,
+            kernel_size=kernel_size_map[config.kernel_size],
+            stride=config.stride,
+            padding=config.padding,
+            pooling_size=config.pooling_size
+        ):
+            print(f"Invalid architecture configuration: {config}")
+            return  # Skip this run
+
 
         # Initialize model with the current WandB configuration
         model = CNN_97(
@@ -137,25 +192,46 @@ def train():
 
         # Optimizer mapping
         optimizer_map = {
+            'SGD': torch.optim.SGD,
             'AdamW': torch.optim.AdamW,
         }
 
-        # To avoid redundant runs
+        # Validate weight decay combinations
         valid_optimizer_weight_decay_combinations = {
+            'SGD': sweep_config['parameters']['weight_decay']['values'],
             'AdamW': sweep_config['parameters']['weight_decay']['values'],
+            'AdaGrad': sweep_config['parameters']['weight_decay']['values'],
+            'Adam': sweep_config['parameters']['weight_decay']['values'],
         }
 
+        # Validate momentum combinations (only relevant for SGD)
+        valid_optimizer_momentum_combinations = {
+            'SGD': sweep_config['parameters']['momentum']['values']
+        }
 
-        if config.weight_decay not in valid_optimizer_weight_decay_combinations[config.optimizer]:
+        # Check weight decay for the current optimizer
+        if config.weight_decay not in valid_optimizer_weight_decay_combinations.get(config.optimizer, []):
             print(f"Invalid combination: {config.optimizer} + {config.weight_decay}")
-            return # skips the current run
-        
-        
-        elif config.optimizer == 'AdamW':
+            return  # Skip the current run
+
+        # Check momentum only if the optimizer uses it
+        if config.optimizer == 'SGD' and config.momentum not in valid_optimizer_momentum_combinations['SGD']:
+            print(f"Invalid combination: {config.optimizer} + {config.weight_decay} + {config.momentum}")
+            return  # Skip the current run
+
+        # Define optimizer parameters
+        if config.optimizer == 'SGD':
             optimizer_params = {
                 'params': model.parameters(),
                 'lr': config.learning_rate,
-                'weight_decay': config.weight_decay  # Only for AdamW
+                'weight_decay': config.weight_decay,
+                'momentum': config.momentum,
+            }
+        elif config.optimizer in ['AdamW', 'Adam', 'AdaGrad']:
+            optimizer_params = {
+                'params': model.parameters(),
+                'lr': config.learning_rate,
+                'weight_decay': config.weight_decay,  # Only for optimizers that support weight decay
             }
 
 
@@ -188,8 +264,11 @@ def train():
         test_data_loader = DataLoader(dataset_test, batch_size=500, shuffle=False, num_workers=1)
 
         # Training Loop
-        best_vloss = float('inf')
-        exceed_rmse_count = 0  # Counter for consecutive epochs with test_rmse > 8
+        # Initialize variables to track early stopping
+        previous_val_loss = float('inf')  # Start with a very high value
+        exceed_val_loss_count = 0  # Counter for consecutive increases in validation loss
+        max_increase_epochs = 6  # Number of consecutive epochs allowed for increasing loss
+        delta = 0.001  # Minimum improvement needed to reset early stopping counter
         best_vloss = float('inf')
         for epoch in range(config.epochs):
             print(f'EPOCH {epoch + 1}:')
@@ -232,20 +311,27 @@ def train():
                 model_path = MODEL_DIR / f"model_{model.__class__.__name__}_{wandb.run.name}"
                 torch.save(model.state_dict(), model_path)
                 
-            if validation_rmse > 10:
-                exceed_rmse_count += 1
-                if exceed_rmse_count >= 30:
-                    print("Test RMSE exceeded 8 for 10 consecutive epochs. Ending training early.")
-                    break
+           # Early Stopping Logic
+            if validation_rmse < (previous_val_loss - delta):  # Check improvement with delta
+                previous_val_loss = validation_rmse
+                exceed_val_loss_count = 0  # Reset counter on improvement
             else:
-                exceed_rmse_count = 0  # Reset counter if condition is not met
+                exceed_val_loss_count += 1
+                if exceed_val_loss_count >= max_increase_epochs:  # Stop if insufficient improvement for too long
+                    break
+
+            # Additional conditions to break training based on validation_rmse at specific epochs
+            if epoch == 5 and validation_rmse > 11:  
+                break
+            if epoch == 20 and validation_rmse > 4: 
+                break
           
     # Ensure that each run is properly finished
     #wandb.finish()
 
 # WandB Sweep Configuration
 sweep_config = {
-    'method': 'grid',  # Specifies grid search to try all configurations
+    'method': 'random',  # Specifies grid search to try all configurations
     
     'metric': 
         {'name': 'validation_rmse', 'goal': 'minimize'}
@@ -253,25 +339,25 @@ sweep_config = {
     
     'parameters': {
         'conv_dropout': {
-            'values': [0] #[0.1, 0.3, 0.5]
+            'values': [0,0.1,0.3] #[0.1, 0.3, 0.5]
         },
         'linear_dropout': {
-            'values': [0] #[0.1, 0.3, 0.5]
+            'values': [0,0.1,0.3] #[0.1, 0.3, 0.5]
         },
         'kernel_size': {
-            'values': ['3x3']
+            'values': ['5x5','7x7','3x5','5x3']
         },
         'hidden_units': {
-            'values': [128,256] #[64, 128, 256]
+            'values': [64,128,256] #[64, 128, 256]
         },
         'learning_rate': {
             'values': [1e-4]
         },
         'epochs': {
-            'values': [50] #[10, 20, 50]
+            'values': [40] #[10, 20, 50]
         },
         'batch_size': {
-            'values': [32] #[16, 32, 64]
+            'values': [16] #[16, 32, 64]
         },
         'num_conv_layers':{
             'values': [3,4]
@@ -280,19 +366,19 @@ sweep_config = {
             'values': [2,3] #[1,2,3]
         },
         'stride': {
-            'values': [1] #[1,2,3]
+            'values': [1,2,3] #[1,2,3]
         },
         'padding': {
-            'values': [1] #[1,2,3]
+            'values': [1,2] #[1,2,3]
         },
         'pooling_size':{
-            'values': [2] #[1,2,4]
+            'values': [1,2] #[1,2,4]
         },
         'out_channels':{
-            'values': [32] #[16,32] # at least 2^max_num_conv layers
+            'values': [8,16] #[16,32] # at least 2^max_num_conv layers
         },
         'activation_fn': {
-            'values': ['ReLU']
+            'values': ['ReLU','LeakyReLU']
         },
         'weights_init': {
             'values': ['Kaiming_normal']
@@ -307,24 +393,23 @@ sweep_config = {
         'use_fc_batchnorm': {
             'values': [True] #[True, False]
         },
-
         # Parameters for optimizer
         'optimizer': {
-            'values': ['AdamW'] #['SGD', 'Adam', 'AdamW', 'AdaGrad']
+            'values': ['SGD'] #['SGD', 'Adam', 'AdamW', 'AdaGrad']
         },
         'weight_decay': {
-            'values': [0,1e-4] #[0, 1e-5, 1e-4, 1e-3, 1e-2]        
+            'values': [1e-2,1e-5] #[0, 1e-5, 1e-4, 1e-3, 1e-2]        
         },
-        # 'momentum': {
-        #     'values': [0.7, 0.8, 0.9]        
-        # }
+        'momentum': {
+            'values': [0.8,0.9]        
+        }
     }
 }
 
 if __name__ == "__main__":
-    # Initialize the sweep in WandB
+    # Initialize the sweep in WabndB
     sweep_id = wandb.sweep(sweep_config, project="Preprocess with sobel")
-    wandb.agent(sweep_id, train)
+    wandb.agent(sweep_id, train,count=200)
 
 
 

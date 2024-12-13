@@ -6,11 +6,12 @@ import torch
 from torchvision.transforms import transforms
 from torch.utils.data import DataLoader
 import wandb
+import time
 import os
-from custom_transforms import LoadSpectrogram, NormalizeSpectrogram, ToTensor, InterpolateSpectrogram
+from custom_transforms import LoadSpectrogram, NormalizeSpectrogram, ToTensor, InterpolateSpectrogram, Prepro
 from data_management import make_dataset_name
 from models import SpectrVelCNNRegr, weights_init_uniform_rule
-
+#LoadSpectrogram, NormalizeSpectrogram, ToTensor, InterpolateSpectrogram, Prepro
 load_dotenv()
 
 # Use the API key from the environment variable
@@ -22,7 +23,7 @@ GROUP_NUMBER = 97
 # CONSTANTS TO MODIFY AS YOU WISH
 MODEL = SpectrVelCNNRegr
 LEARNING_RATE = 10**-5
-EPOCHS = 300 # the model converges in test perfermance after ~250-300 epochs
+EPOCHS = 300 #the model converges in test perfermance after ~250-300 epochs
 BATCH_SIZE = 10
 NUM_WORKERS = 4
 OPTIMIZER = torch.optim.SGD
@@ -33,7 +34,7 @@ DEVICE = (
     if torch.backends.mps.is_available()
     else "cpu"
 )
-# DEVICE = "cpu"
+#DEVICE = "cpu"
 
 # You can set the model path name in case you want to keep training it.
 # During the training/testing loop, the model state is saved
@@ -53,26 +54,41 @@ VR_CROPTWIDTH = (-60, 15)
 
 # Define save directory and file name
 SAVE_DIR = os.path.expanduser("~/my_project_dir/DeepLearning97/log")
-SAVE_NAME = "BaseCNN_ValErr.npy"
+SAVE_NAME_err = "BaseCNN_ValErr_091224.npy"
+SAVE_NAME_time ="BaseCNN_Time_091224.npy"
 
 # Ensure the directory exists
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 # Full path to the save file
-SAVE_PATH = os.path.join(SAVE_DIR, SAVE_NAME)
+SAVE_PATH_err = os.path.join(SAVE_DIR, SAVE_NAME_err)
+SAVE_PATH_time = os.path.join(SAVE_DIR, SAVE_NAME_time)
 
 
-def evaluate_on_validation(model, validation_data_loader):
+def evaluate_on_validation(model, validation_data_loader, save_path_errors, save_path_times):
     model.eval()  # Set model to evaluation mode
     errors = []
+    interface_times = []
 
     with torch.no_grad():  # Disable gradient computation
         for vdata in validation_data_loader:
             spectrogram, target = vdata["spectrogram"].to(DEVICE), vdata["target"].to(DEVICE)
+            start_time = time.time()
             outputs = model(spectrogram)
+            end_time = time.time()
+            interface_time = (end_time - start_time) / spectrogram.shape[0]
+            print(f"interTime in loop : '{interface_time}'")
             error = torch.abs(outputs.squeeze() - target).item()  # Absolute error for each step
             errors.append(error)
+            interface_times.append(interface_time)
 
+    # Save errors and interface times
+    print(f"interTime outside loop : '{interface_time}'")
+    np.save(save_path_errors, np.array(errors))
+    np.save(save_path_times, np.array(interface_times))
+    print(f"Validation errors saved to '{save_path_errors}'")
+    print(f"Interface times saved to '{save_path_times}'")
+    
     return errors
 
 
@@ -124,13 +140,24 @@ if __name__ == "__main__":
         ToTensor(),
         InterpolateSpectrogram()]
     )
-
+    # TRAIN_TRANSFORM = transforms.Compose(
+    #     [LoadSpectrogram(root_dir=data_dir / "train"),
+    #     Prepro(),
+    #     ToTensor(),
+    #     InterpolateSpectrogram()]
+    #     )
+    # TEST_TRANSFORM = transforms.Compose(
+    #         [LoadSpectrogram(root_dir=data_dir / "test"),
+    #         Prepro(),
+    #         ToTensor(),
+    #         InterpolateSpectrogram()]
+    #     )
     VALIDATION_TRANSFORM = transforms.Compose(
     [LoadSpectrogram(root_dir=data_dir / "validation"),
-     NormalizeSpectrogram(),
-     ToTensor(),
-     InterpolateSpectrogram()]
-)
+      NormalizeSpectrogram(),
+    ToTensor(),
+    InterpolateSpectrogram()]
+    )
 
     dataset_validation = MODEL.dataset(data_dir=data_dir / "validation",
                                    stmf_data_path=DATA_ROOT / STMF_FILENAME,
@@ -266,8 +293,5 @@ if __name__ == "__main__":
         epoch_number += 1
    # Evaluate on validation set after training
     print("Evaluating on validation data...")
-    validation_errors = evaluate_on_validation(model, validation_data_loader)
+    validation_errors = evaluate_on_validation(model, validation_data_loader,SAVE_PATH_err,SAVE_NAME_time)
 
-    # Save validation errors
-    np.save(SAVE_PATH, np.array(validation_errors))
-    print(f"Validation errors saved to '{SAVE_PATH}'")

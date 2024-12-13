@@ -1,6 +1,6 @@
 #!/bin/sh
 #BSUB -q gpua100
-#BSUB -J BASE
+#BSUB -J BaseSob
 ### number of core
 #BSUB -n 4
 ### specify that all cores should be on the same host
@@ -22,4 +22,4 @@ module load python3/3.10.13
 source ~/my_project_dir/02456_grp_99_venv/bin/activate
 
 # Run the Python script
-python3 ~/my_project_dir/DeepLearning97/scripts/Baseline.py > log/Baseline0912$(date +"%d-%m-%y")_$(date +'%H:%M:%S').log
+python3 ~/my_project_dir/DeepLearning97/scripts/Baseline.py > log/Baseline$(date +"%d-%m-%y")_$(date +'%H:%M:%S').log

@@ -3,11 +3,15 @@ import torch.nn as nn
 from torchvision.transforms import transforms
 
 from torch.utils.data import DataLoader
-from custom_transforms import LoadSpectrogram, NormalizeSpectrogram, ToTensor, InterpolateSpectrogram
+from custom_transforms import LoadSpectrogram, NormalizeSpectrogram, ToTensor, InterpolateSpectrogram, Prepro
 from data_management import make_dataset_name
 from pathlib import Path
 
-from models import CNN_97
+from loss import mse_loss
+
+import cv2
+
+from models import CNN_97, SpectrVelCNNRegr
 
 import time
 
@@ -33,29 +37,52 @@ VAL_TRANSFORM = transforms.Compose([
 
 
 # Define model with parameters used in the model considering
-model = CNN_97(
-    num_conv_layers=3,  # Example value, use the same as the trained model
-    num_fc_layers=3,
-    conv_dropout=0.2,
-    linear_dropout=0,
-    kernel_size=(5, 7),
-    activation=nn.ReLU,  # Example activation function, change as needed
-    hidden_units=64,
-    padding=0,
-    stride=2,
-    pooling_size=1,
-    out_channels=8,
-    use_fc_batchnorm=True,
-    use_cnn_batchnorm=True
-).to(DEVICE)
+# model = CNN_97(
+#     num_conv_layers=3,  # Example value, use the same as the trained model
+#     num_fc_layers=3,
+#     conv_dropout=0.2,
+#     linear_dropout=0,
+#     kernel_size=(5, 7),
+#     activation=nn.ReLU,  # Example activation function, change as needed
+#     hidden_units=64,
+#     padding=0,
+#     stride=2,
+#     pooling_size=1,
+#     out_channels=8,
+#     use_fc_batchnorm=True,
+#     use_cnn_batchnorm=True
+# ).to(DEVICE)
+
+# Model for Preprocessed data
+# model = CNN_97(
+#     num_conv_layers=2,  # Example value, use the same as the trained model
+#     num_fc_layers=3,
+#     conv_dropout=0,
+#     linear_dropout=0,
+#     kernel_size=(5, 5),
+#     activation=nn.ReLU,  # Example activation function, change as needed
+#     hidden_units=64,
+#     padding=1,
+#     stride=1,
+#     pooling_size=1,
+#     out_channels=8,
+#     use_fc_batchnorm=True,
+#     use_cnn_batchnorm=True
+# ).to(DEVICE)
+
+model = SpectrVelCNNRegr()
 
 # Load model parameters from saved model file
-model_path = ['models/model_CNN_97_fanciful-sweep-1', 
-              'models/model_CNN_97_twilight-sweep-1',
-              'models/model_CNN_97_misty-sweep-1',
-              'models/model_CNN_97_devoted-sweep-1']
+# model_path = ['models/model_CNN_97_fanciful-sweep-1', 
+#               'models/model_CNN_97_twilight-sweep-1',
+#               'models/model_CNN_97_misty-sweep-1',
+#               'models/model_CNN_97_devoted-sweep-1']
 
-model.load_state_dict(torch.load(model_path[0]))
+# model_path = 'models/model_CNN_97_firm-sweep-50'
+
+model_path = 'models/model_SpectrVelCNNRegr_atomic-night-34'
+
+model.load_state_dict(torch.load(model_path))
 
 # Set the model to evaluation mode
 model.eval()
@@ -71,6 +98,7 @@ test_data_loader = DataLoader(dataset_val, batch_size=500, shuffle=False, num_wo
 print("-------- data loaded -----------")
 
 loss_fn = model.loss_fn
+
 with torch.no_grad():
     print("IN with torch.no_grad()")
     print(len(test_data_loader))

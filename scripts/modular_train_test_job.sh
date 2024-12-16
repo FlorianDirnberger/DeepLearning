@@ -8,7 +8,7 @@
 ### specify the memory needed
 #BSUB -R "rusage[mem=10GB]"
 ### Number of hours needed
-#BSUB -W 71:59
+#BSUB -W 4:00
 ### added outputs and errors to files
 #BSUB -o outputs/Output_%J.out
 #BSUB -e outputs/Error_%J.err

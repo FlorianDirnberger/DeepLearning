@@ -13,14 +13,19 @@ from data_management import make_dataset_name
 #from models import SpectrVelCNNRegr, CNN_97, weights_init_uniform_rule
 from models import CNN_97, weights_init_uniform_rule, weights_init
 
+from synthetic import generate_synthetic_tensor
+
 # GROUP NUMBER
 GROUP_NUMBER = 97
 
 # CONSTANTS TO LEAVE
-DATA_ROOT = Path(f"/dtu-compute/02456-p4-e24/data") 
+# DATA_ROOT = Path(f"/dtu-compute/02456-p4-e24/data") 
+# DATA_ROOT = Path(f"/zhome/ab/2/212292/dl/p4-velocity/DeepLearning97/synthetic_data")
+# DATA_ROOT = Path(f"/synthetic_data")
 ROOT = Path(__file__).parent.parent
+DATA_ROOT = ROOT / "synthetic_data"
 MODEL_DIR = ROOT / "models"
-STMF_FILENAME = "stmf_data_3.csv"
+STMF_FILENAME = "stmf_synthetic_data.csv"
 NFFT = 512
 TS_CROPTWIDTH = (-150, 200)
 VR_CROPTWIDTH = (-60, 15)
@@ -203,8 +208,9 @@ def train():
         loss_fn = model.loss_fn
 
         # Data Setup
-        dataset_name = make_dataset_name(nfft=NFFT, ts_crop_width=TS_CROPTWIDTH, vr_crop_width=VR_CROPTWIDTH)
-        data_dir = DATA_ROOT / dataset_name
+        # dataset_name = make_dataset_name(nfft=NFFT, ts_crop_width=TS_CROPTWIDTH, vr_crop_width=VR_CROPTWIDTH)
+        # data_dir = DATA_ROOT / dataset_name
+        data_dir = DATA_ROOT
 
         TRAIN_TRANSFORM = transforms.Compose([
             LoadSpectrogram(root_dir=data_dir / "train"),
@@ -212,18 +218,18 @@ def train():
             ToTensor(),
             InterpolateSpectrogram()
         ])
-        TEST_TRANSFORM = transforms.Compose([
-            LoadSpectrogram(root_dir=data_dir / "test"),
+        VAL_TRANSFORM = transforms.Compose([
+            LoadSpectrogram(root_dir=data_dir / "validation"),
             NormalizeSpectrogram(),
             ToTensor(),
             InterpolateSpectrogram()
         ])
 
         dataset_train = model.dataset(data_dir=data_dir / "train", stmf_data_path=DATA_ROOT / STMF_FILENAME, transform=TRAIN_TRANSFORM)
-        dataset_test = model.dataset(data_dir=data_dir / "test", stmf_data_path=DATA_ROOT / STMF_FILENAME, transform=TEST_TRANSFORM)
+        dataset_val = model.dataset(data_dir=data_dir / "validation", stmf_data_path=DATA_ROOT / STMF_FILENAME, transform=VAL_TRANSFORM)
         
         train_data_loader = DataLoader(dataset_train, batch_size=config.batch_size, shuffle=True, num_workers=4)
-        test_data_loader = DataLoader(dataset_test, batch_size=500, shuffle=False, num_workers=1)
+        val_data_loader = DataLoader(dataset_val, batch_size=500, shuffle=False, num_workers=1)
 
         # Training Loop
         best_vloss = float('inf')
@@ -240,15 +246,11 @@ def train():
             running_test_loss = 0.
             model.eval()
             with torch.no_grad():
-                print("---------------------------------")
-                print(len(test_data_loader))
-                for i, vdata in enumerate(test_data_loader):
-                    print("IN for ... enumerate(test_data_loader)")
+                for i, vdata in enumerate(val_data_loader):
                     spectrogram, target = vdata["spectrogram"].to(DEVICE), vdata["target"].to(DEVICE)
                     test_outputs = model(spectrogram)
                     test_loss = loss_fn(test_outputs.squeeze(), target)
                     running_test_loss += test_loss.item()
-                print("---------------------------------")
 
             avg_test_loss = running_test_loss / (i + 1)
             validation_rmse = avg_test_loss ** 0.5
@@ -311,7 +313,7 @@ sweep_config = {
             'values': [1e-4] #[1e-4, 1e-5, 1e-6]
         },
         'epochs': {
-            'values': [350]
+            'values': [1]
         },
         'batch_size': {
             'values': [32] #[16, 32, 64] #[16, 32, 64]

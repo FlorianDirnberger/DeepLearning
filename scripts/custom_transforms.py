@@ -6,6 +6,8 @@ import numpy as np
 import torch
 from torchvision.transforms.functional import resize
 
+import cv2
+
 class LoadSpectrogram(object):
     def __init__(self, root_dir: Path) -> None:
         self.root_dir = root_dir
@@ -15,6 +17,37 @@ class LoadSpectrogram(object):
         spectrogram_filepath = self.root_dir / f"{obs_no}_stacked_spectrograms.npy"
 
         return np.load(spectrogram_filepath)
+
+
+class Prepro(object): # first 4 channels are power and last two are phase
+    def __init__(self):
+        # Define power and phase channels
+        self.power_channels = [0, 1, 2, 3]  # Assuming channels 0-3 are power channels
+        self.phase_spectrogram_limits = (-np.pi, np.pi)  # Limits for phase channels
+
+    def __call__(self, spectrogram: np.ndarray) -> np.ndarray:
+        # Copy the spectrogram to avoid modifying the original data
+        spectrogram_processed = spectrogram.copy()
+       
+        # Apply Sobel filter with ksize=31 on x-axis only to power channels
+        for ch in self.power_channels:
+            # Get the channel data
+            channel_data = spectrogram_processed[:, :, ch].astype(np.float64)
+
+            # Apply Sobel filter in the x-direction
+            sobelx = cv2.Sobel(channel_data, cv2.CV_64F, dx=1, dy=0, ksize=31)
+
+            # Compute the gradient magnitude
+            sobelx = np.sqrt(sobelx**2)
+
+            # Replace the channel data with the Sobel filtered data
+            spectrogram_processed[:, :, ch] = cv2.normalize(sobelx, None, 0, 1, cv2.NORM_MINMAX)
+        
+        # Normalize the phase channels (channels 4 and 5)
+        spectrogram_processed[:, :, 4:] -= self.phase_spectrogram_limits[0]
+        spectrogram_processed[:, :, 4:] /= self.phase_spectrogram_limits[1] - self.phase_spectrogram_limits[0]
+        # Return the processed spectrogram
+        return spectrogram_processed
 
 class NormalizeSpectrogram(object):
     phase_spectrogram_limits = (-np.pi, np.pi)

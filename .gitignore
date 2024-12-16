@@ -8,7 +8,7 @@
 *.out
 
 # Ignore pychache folder
-scripts/__pychache__/
+scripts/__pycache__/
 
 # Ignore log files
 *.log

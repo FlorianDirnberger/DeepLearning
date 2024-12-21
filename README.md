@@ -7,6 +7,8 @@ Here is a quick overview of the important branches:
 - FloFlo: Time series neural networks 
 - Jason: Data Preprocssing Approaches and Optimized CNN
 -  attention_layer: Optimized CNN and Sweeps in Wandb
+
+  
   In the main branch there is the requested Jupyter notebook.
   Please consider that due to the NDA we signed with Trackman and Mark, we only used randomized dummy values to show that the models work.
   Test errors can significantly differ from our actual results. 
